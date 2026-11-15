@@ -922,6 +922,49 @@ body {
   justify-content: center;
 }
 
+/* Feedback Box untuk Aksi Output (Milestone 5) */
+.sidebar-feedback-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sidebar-feedback {
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  line-height: 1.4;
+  margin-top: var(--space-2);
+  animation: feedbackFadeIn 150ms ease;
+}
+
+.sidebar-feedback--success {
+  background-color: color-mix(in srgb, var(--color-primary) 12%, #fff);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.sidebar-feedback--info {
+  background-color: var(--status-mismatch-bg);
+  border: 1px solid color-mix(in srgb, var(--status-mismatch) 30%, transparent);
+  color: var(--status-mismatch-text);
+}
+
+.sidebar-feedback--error {
+  background-color: var(--status-missing-bg);
+  border: 1px solid color-mix(in srgb, var(--status-missing) 30%, transparent);
+  color: var(--status-missing-text);
+}
+
+@keyframes feedbackFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- Mini Privacy Box dalam Sidebar --- */
 .sidebar-privacy {
   display: flex;

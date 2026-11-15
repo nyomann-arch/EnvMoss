@@ -16,6 +16,12 @@
  */
 
 import { compareEnvFiles } from './env-engine.js';
+import {
+  generateMarkdownChecklist,
+  generateMergedEnv,
+  copyToClipboard,
+  downloadFile
+} from './output-generator.js';
 
 // ---------------------------------------------------------------------------
 // State aplikasi — hanya di memori, tidak persisten
@@ -539,25 +545,110 @@ function clearResults() {
 }
 
 /**
- * Mengaitkan event handler placeholder pada tombol output di sidebar.
- * Logika Clipboard API dan Blob API penuh akan diimplementasikan pada Milestone 5.
+ * Menampilkan pesan feedback aksi di bawah tombol output sidebar.
  *
- * @param {any} result
+ * @param {string} message - Pesan feedback (tanpa secret)
+ * @param {'success'|'info'|'error'} [type='info']
+ */
+function showSidebarFeedback(message, type = 'info') {
+  const container = document.getElementById('sidebar-feedback-container');
+  if (!container) return;
+
+  let iconSvg = '';
+  if (type === 'success') {
+    iconSvg = `
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5 8.5L7 10.5L11 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+  } else if (type === 'error') {
+    iconSvg = `
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M6 6L10 10M10 6L6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    `;
+  } else {
+    iconSvg = `
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 5V8M8 11H8.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  container.innerHTML = `
+    <div class="sidebar-feedback sidebar-feedback--${type}" role="status">
+      ${iconSvg}
+      <span>${escapeHtml(message)}</span>
+    </div>
+  `;
+
+  // Bersihkan pesan setelah 5 detik
+  setTimeout(() => {
+    if (container.innerHTML.includes(message)) {
+      container.innerHTML = '';
+    }
+  }, 5000);
+}
+
+/**
+ * Mengaitkan event handler pada tombol output di sidebar:
+ *   - btn-copy-checklist: Menyalin task list Markdown key Missing via Clipboard API
+ *   - btn-download-merged: Mengunduh salinan Target + key Missing via Blob API
+ *
+ * @param {any} result - Hasil komparasi
  */
 function attachOutputHooks(result) {
   const copyBtn = document.getElementById('btn-copy-checklist');
   const downloadBtn = document.getElementById('btn-download-merged');
 
   if (copyBtn && !copyBtn.disabled) {
-    copyBtn.addEventListener('click', () => {
-      // Disiapkan untuk Milestone 5
-      // Jika Milestone 5 belum aktif, tombol dapat memberikan feedback siap pakai
+    copyBtn.addEventListener('click', async () => {
+      const markdown = generateMarkdownChecklist(result.missing);
+      if (!markdown) {
+        showSidebarFeedback('Tidak ada key Missing untuk dibuatkan checklist.', 'info');
+        return;
+      }
+
+      try {
+        await copyToClipboard(markdown);
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <path d="M4 9.5L7.5 13L14 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Tersalin ke Clipboard!
+        `;
+        copyBtn.disabled = true;
+        showSidebarFeedback('Checklist Markdown berhasil disalin ke clipboard.', 'success');
+
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHtml;
+          copyBtn.disabled = false;
+        }, 2000);
+      } catch (err) {
+        showSidebarFeedback(err.message || 'Gagal menyalin ke clipboard.', 'error');
+      }
     });
   }
 
   if (downloadBtn) {
     downloadBtn.addEventListener('click', () => {
-      // Disiapkan untuk Milestone 5
+      try {
+        const targetText = textareaTarget.value;
+        const mergedContent = generateMergedEnv(targetText, result.missing);
+        downloadFile(mergedContent, 'envmoss-merged.env');
+
+        if (result.missing && result.missing.length > 0) {
+          showSidebarFeedback('File envmoss-merged.env diunduh. Harap lengkapi nilai variabel kosong sebelum digunakan.', 'info');
+        } else {
+          showSidebarFeedback('File envmoss-merged.env diunduh (identik dengan Target asli).', 'success');
+        }
+      } catch (err) {
+        showSidebarFeedback(err.message || 'Gagal membuat file unduhan.', 'error');
+      }
     });
   }
 }
@@ -837,6 +928,8 @@ function renderResults(result) {
               Unduh Merged .env
             </button>
           </div>
+
+          <div class="sidebar-feedback-container" id="sidebar-feedback-container" aria-live="polite"></div>
 
           <div class="sidebar-privacy">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
