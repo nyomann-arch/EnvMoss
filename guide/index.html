@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Bootstrap preferensi: tema & bahasa — sinkron, blocking, tanpa jaringan.
+       Wajib berjalan sebelum stylesheet agar first paint tidak berkedip (FOUC). -->
+  <script>
+  (function () {
+    var root = document.documentElement;
+
+    // --- Tema: envmoss:theme = light | dark | system ---
+    var themePref = 'system';
+    try {
+      var storedTheme = window.localStorage.getItem('envmoss:theme');
+      if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+        themePref = storedTheme;
+      }
+    } catch (e) { /* storage tidak tersedia — gunakan fallback */ }
+
+    var themeResolved = 'light';
+    if (themePref === 'light' || themePref === 'dark') {
+      themeResolved = themePref;
+    } else {
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          themeResolved = 'dark';
+        }
+      } catch (e) { /* matchMedia tidak tersedia — fallback light */ }
+    }
+    root.setAttribute('data-theme', themeResolved);
+    root.setAttribute('data-theme-pref', themePref);
+
+    // --- Bahasa: envmoss:language = en | id ---
+    var lang = 'en';
+    try {
+      var storedLang = window.localStorage.getItem('envmoss:language');
+      if (storedLang === 'en' || storedLang === 'id') {
+        lang = storedLang;
+      } else {
+        var navLangs = (navigator.languages && navigator.languages.length)
+          ? navigator.languages
+          : [navigator.language || ''];
+        for (var i = 0; i < navLangs.length; i += 1) {
+          var candidate = String(navLangs[i] || '').toLowerCase();
+          if (candidate.indexOf('id') === 0) { lang = 'id'; break; }
+          if (candidate.indexOf('en') === 0) { lang = 'en'; break; }
+        }
+      }
+    } catch (e) { /* storage/navigator tidak tersedia — fallback en */ }
+    root.setAttribute('lang', lang);
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('data-i18n-pending', 'true');
+  })();
+  </script>
+
+  <!-- Primary Meta Tags -->
+  <title>Panduan — EnvMoss</title>
+  <meta name="title" content="Panduan — EnvMoss" />
+  <meta name="description" content="Panduan penggunaan EnvMoss: cara memasukkan file .env, menjalankan komparasi, memahami status hasil, dan menggunakan output Markdown Checklist serta Merged .env." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://envmoss.vercel.app/guide/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://envmoss.vercel.app/guide/" />
+  <meta property="og:title" content="Panduan — EnvMoss" />
+  <meta property="og:description" content="Panduan penggunaan EnvMoss: komparasi file environment secara lokal di browser." />
+  <meta property="og:image" content="https://envmoss.vercel.app/assets/og-image.png" />
+  <meta property="og:site_name" content="EnvMoss" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://envmoss.vercel.app/guide/" />
+  <meta name="twitter:title" content="Panduan — EnvMoss" />
+  <meta name="twitter:description" content="Panduan penggunaan EnvMoss: komparasi file environment secara lokal di browser." />
+  <meta name="twitter:image" content="https://envmoss.vercel.app/assets/og-image.png" />
+
+  <!-- Stylesheet: fondasi global lalu stylesheet khusus Guide -->
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/guide.css" />
+</head>
+<body class="page--guide">
+
+  <!-- ==============================
+       Navbar global (fixed)
+  ============================== -->
+  <header class="site-header">
+    <nav class="site-navbar" aria-label="Navigasi utama">
+      <div class="site-navbar__inner">
+
+        <!-- Brand: mark + wordmark — satu-satunya tautan ke Landing -->
+        <a href="../" class="site-brand" aria-label="EnvMoss — ke halaman utama">
+          <span class="site-brand__mark" aria-hidden="true">
+            <!-- Ikon daun lumut — SVG lokal inline -->
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <!-- Lingkaran latar -->
+              <circle cx="14" cy="14" r="14" fill="#3D6B4F" />
+              <!-- Bentuk daun/tetes — organik, sederhana -->
+              <path
+                d="M14 6C14 6 7 10.5 7 16C7 19.866 10.134 23 14 23C17.866 23 21 19.866 21 16C21 10.5 14 6 14 6Z"
+                fill="#ffffff"
+                fill-opacity="0.90"
+              />
+              <!-- Tulang daun tengah -->
+              <line
+                x1="14"
+                y1="23"
+                x2="14"
+                y2="10"
+                stroke="#3D6B4F"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+              <!-- Urat daun kiri -->
+              <line
+                x1="14"
+                y1="17"
+                x2="10"
+                y2="14"
+                stroke="#3D6B4F"
+                stroke-width="1"
+                stroke-linecap="round"
+                stroke-opacity="0.6"
+              />
+              <!-- Urat daun kanan -->
+              <line
+                x1="14"
+                y1="20"
+                x2="17.5"
+                y2="17"
+                stroke="#3D6B4F"
+                stroke-width="1"
+                stroke-linecap="round"
+                stroke-opacity="0.6"
+              />
+            </svg>
+          </span>
+          <span class="site-brand__name">EnvMoss</span>
+        </a>
+
+        <!-- Kontrol kanan: navigasi + bahasa + tema + indikator privasi -->
+        <div class="site-navbar__controls">
+
+          <ul class="site-nav">
+            <li>
+              <a class="site-nav__link" href="../app/" data-nav="tool">Tool</a>
+            </li>
+            <li>
+              <a class="site-nav__link" href="./" data-nav="guide">Guide</a>
+            </li>
+          </ul>
+
+          <div class="site-lang" role="group" aria-label="Pilih bahasa antarmuka">
+            <button
+              type="button"
+              class="site-lang__btn"
+              data-lang-set="en"
+              aria-pressed="false"
+            >EN</button>
+            <button
+              type="button"
+              class="site-lang__btn"
+              data-lang-set="id"
+              aria-pressed="true"
+            >ID</button>
+          </div>
+
+          <button
+            type="button"
+            class="site-theme"
+            id="site-theme-toggle"
+            data-state="system"
+            aria-label="Ubah tema tampilan"
+          >
+            <!-- Ikon terang (matahari) -->
+            <svg
+              class="site-theme__icon site-theme__icon--sun"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="9" cy="9" r="3.5" stroke="currentColor" stroke-width="1.5" />
+              <path d="M9 1.5v2M9 14.5v2M1.5 9h2M14.5 9h2M3.4 3.4l1.4 1.4M13.2 13.2l1.4 1.4M14.6 3.4l-1.4 1.4M4.8 13.2l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <!-- Ikon gelap (bulan) -->
+            <svg
+              class="site-theme__icon site-theme__icon--moon"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M15 10.5A6.5 6.5 0 017.5 3a6.5 6.5 0 107.5 7.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+            </svg>
+            <!-- Ikon sistem (monitor) -->
+            <svg
+              class="site-theme__icon site-theme__icon--system"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <rect x="2" y="3" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+              <path d="M6 15h6M9 12v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
+
+          <!-- Indikator privasi ringkas -->
+          <span class="site-navbar__indicator" aria-label="Semua pemrosesan dilakukan di browser Anda">
+            100% Client-Side
+          </span>
+
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- ==============================
+       Main Content — Guide (kerangka awal Milestone 7)
+  ============================== -->
+  <main class="site-main guide-article">
+
+    <header class="guide-article__header">
+      <h1 class="guide-article__title">Panduan EnvMoss</h1>
+      <p class="guide-article__lead">
+        Cara menggunakan EnvMoss untuk membandingkan dua file environment
+        secara lokal di browser.
+      </p>
+    </header>
+
+    <section class="guide-section" aria-labelledby="guide-start">
+      <h2 class="guide-section__title" id="guide-start">Mulai di sini</h2>
+      <ol class="guide-steps">
+        <li>Buka <a href="../app/">Comparison Tool</a>.</li>
+        <li>Masukkan <strong>Base Environment</strong> (biasanya <code>.env.example</code>) dan <strong>Target Environment</strong> (file yang ingin diperiksa) melalui drag-and-drop, pemilih file, atau copy-paste ke textarea.</li>
+        <li>Tekan <strong>Bandingkan</strong> untuk melihat Missing, Orphan, Duplicate, dan Mismatch.</li>
+        <li>Gunakan <strong>Salin Markdown Checklist</strong> atau <strong>Unduh Merged .env</strong> untuk menindaklanjuti hasil.</li>
+      </ol>
+    </section>
+
+    <section class="guide-section" aria-labelledby="guide-privacy">
+      <h2 class="guide-section__title" id="guide-privacy">Privasi</h2>
+      <p class="guide-section__text">
+        Isi file <code>.env</code> Anda tetap berada di browser. EnvMoss tidak
+        mengunggahnya ke server dan tidak menyimpannya secara permanen.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- ==============================
+       Footer global
+  ============================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="site-footer__inner">
+      <p>© 2026 EnvMoss - Open Source under MIT License</p>
+    </div>
+  </footer>
+
+  <!-- JS modul perilaku global: navbar aktif, bahasa, tema -->
+  <script type="module" src="../js/site.js"></script>
+
+</body>
+</html>

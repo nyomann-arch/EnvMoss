@@ -19,8 +19,10 @@ function check(id, condition, description) {
   }
 }
 
-const indexHtml = fs.readFileSync('c:/envmoss/index.html', 'utf8');
-const stylesCss = fs.readFileSync('c:/envmoss/css/styles.css', 'utf8');
+const indexHtml = fs.readFileSync('c:/envmoss/app/index.html', 'utf8');
+const stylesCss =
+  fs.readFileSync('c:/envmoss/css/styles.css', 'utf8') +
+  fs.readFileSync('c:/envmoss/css/tool.css', 'utf8');
 const appJs = fs.readFileSync('c:/envmoss/js/app.js', 'utf8');
 const envEngineJs = fs.readFileSync('c:/envmoss/js/env-engine.js', 'utf8');
 const outputGenJs = fs.readFileSync('c:/envmoss/js/output-generator.js', 'utf8');
@@ -240,7 +242,7 @@ check(
 // AC 22: Navbar hanya menampilkan ikon/mark EnvMoss dan nama EnvMoss; tidak menampilkan tagline
 check(
   22,
-  indexHtml.includes('class="navbar__name">EnvMoss<') &&
+  indexHtml.includes('class="site-brand__name">EnvMoss<') &&
   !indexHtml.includes('Local-First Environment Variable Detective') &&
   !indexHtml.includes('Developer Tool'),
   'Navbar minimal hanya memuat icon mark dan EnvMoss, tanpa tagline pemasaran'

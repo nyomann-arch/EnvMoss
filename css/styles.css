@@ -1,6 +1,6 @@
 /* ==========================================================================
    EnvMoss — styles.css
-   Design System v1.0
+   Design System: tokens, reset, komponen global .site-
    ========================================================================== */
 
 @font-face {
@@ -32,9 +32,12 @@
    -------------------------------------------------------------------------- */
 
 :root {
+  color-scheme: light;
+
   /* --- Brand Colors --- */
   --color-primary: #3D6B4F;
   --color-primary-light: #6B9B7A;
+  --color-on-primary: #FFFFFF;
   --color-bg: #F7F9F6;
   --color-surface: #FFFFFF;
   --color-text-primary: #1A2E22;
@@ -92,7 +95,7 @@
 
   /* --- Layout --- */
   --container-width: 1200px;
-  --navbar-height: 56px;
+  --nav-height: 56px;
 
   /* --- Shadows --- */
   --shadow-sm: 0 1px 3px rgba(26, 46, 34, 0.08);
@@ -101,6 +104,42 @@
   /* --- Transitions --- */
   --transition-fast: 150ms ease;
   --transition-base: 200ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   1b. Dark Theme — token ekuivalen untuk prefers-color-scheme gelap
+   -------------------------------------------------------------------------- */
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-primary: #8FBE9B;
+  --color-primary-light: #A8D0B4;
+  --color-on-primary: #16241C;
+  --color-bg: #111914;
+  --color-surface: #19231D;
+  --color-text-primary: #E8F0E9;
+  --color-text-secondary: #B3C1B6;
+  --color-border: #35443A;
+
+  --status-missing: #D98C8C;
+  --status-missing-bg: #2E1F1F;
+  --status-missing-text: #EFB9B9;
+
+  --status-orphan: #E0B23C;
+  --status-orphan-bg: #2E2716;
+  --status-orphan-text: #E8CE7A;
+
+  --status-duplicate: #DE9A55;
+  --status-duplicate-bg: #2E2115;
+  --status-duplicate-text: #F0C290;
+
+  --status-mismatch: #8FB0CC;
+  --status-mismatch-bg: #1B2530;
+  --status-mismatch-text: #B9D2E8;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.40);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 /* --------------------------------------------------------------------------
@@ -129,6 +168,19 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Offset untuk navbar fixed agar konten tidak tertutup */
+  padding-top: var(--nav-height);
+}
+
+/* Hormati preferensi reduced-motion pada semua halaman */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -148,20 +200,37 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   4. Navbar
+   4. Pencegahan kilatan teks bahasa (language flash)
+   Selama bootstrap i18n belum menerapkan kamus, teks bertanda data-i18n
+   ditahan tanpa menghilangkan ruang layout. Milestone 8 akan mengisi
+   atribut data-i18n dan melepas penanda ini.
    -------------------------------------------------------------------------- */
 
-.navbar {
-  position: sticky;
+html[data-i18n-pending="true"] [data-i18n] {
+  visibility: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   5. Navbar global — .site- (fixed, konsisten di semua halaman)
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
-  height: var(--navbar-height);
+  height: var(--nav-height);
+}
+
+.site-navbar {
+  height: 100%;
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
 }
 
-.navbar__inner {
+.site-navbar__inner {
   max-width: var(--container-width);
   margin: 0 auto;
   padding: 0 var(--space-5);
@@ -169,28 +238,32 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-4);
 }
 
-.navbar__brand {
+/* --- Brand --- */
+
+.site-brand {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   text-decoration: none;
   color: inherit;
+  flex-shrink: 0;
 }
 
-.navbar__mark {
+.site-brand__mark {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.navbar__mark svg {
+.site-brand__mark svg {
   width: 28px;
   height: 28px;
 }
 
-.navbar__name {
+.site-brand__name {
   font-size: var(--text-lg);
   font-family: var(--font-logo);
   font-weight: 800;
@@ -198,7 +271,134 @@ body {
   letter-spacing: -0.03em;
 }
 
-.navbar__indicator {
+/* --- Kontrol kanan navbar --- */
+
+.site-navbar__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* --- Navigasi halaman --- */
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.site-nav__link {
+  display: inline-block;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.site-nav__link:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+}
+
+.site-nav__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Tautan aktif: indikator jelas, bukan hanya warna */
+.site-nav__link.is-active {
+  color: var(--color-primary);
+  font-weight: 600;
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  box-shadow: inset 0 -2px 0 var(--color-primary);
+}
+
+/* --- Kontrol bahasa EN/ID --- */
+
+.site-lang {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+.site-lang__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.site-lang__btn + .site-lang__btn {
+  border-left: 1px solid var(--color-border);
+}
+
+.site-lang__btn:hover {
+  color: var(--color-text-primary);
+}
+
+.site-lang__btn[aria-pressed="true"] {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.site-lang__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* --- Kontrol tema --- */
+
+.site-theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast),
+              background-color var(--transition-fast);
+}
+
+.site-theme:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-secondary);
+}
+
+.site-theme:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.site-theme__icon {
+  display: none;
+}
+
+.site-theme[data-state="light"] .site-theme__icon--sun,
+.site-theme[data-state="dark"] .site-theme__icon--moon,
+.site-theme[data-state="system"] .site-theme__icon--system {
+  display: block;
+}
+
+/* --- Indikator privasi --- */
+
+.site-navbar__indicator {
   font-size: var(--text-xs);
   font-family: var(--font-code);
   color: var(--color-text-secondary);
@@ -209,9 +409,10 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  white-space: nowrap;
 }
 
-.navbar__indicator::before {
+.site-navbar__indicator::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -222,234 +423,19 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   5. Main Layout
+   6. Main container & tombol global
    -------------------------------------------------------------------------- */
 
-.main {
+.site-main {
   flex: 1;
+  width: 100%;
   max-width: var(--container-width);
-  width: 100%;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-5);
+  padding: var(--space-6) var(--space-5) var(--space-7);
 }
 
-/* --------------------------------------------------------------------------
-   6. Privacy Notice
-   -------------------------------------------------------------------------- */
-
-.privacy-notice {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  margin-bottom: var(--space-5);
-}
-
-.privacy-notice__icon {
-  flex-shrink: 0;
-  color: var(--color-primary);
-}
-
-/* --------------------------------------------------------------------------
-   7. Input Section
-   -------------------------------------------------------------------------- */
-
-.input-section {
-  margin-bottom: var(--space-5);
-}
-
-.input-section__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-5);
-}
-
-/* --------------------------------------------------------------------------
-   8. Input Card (Base & Target)
-   -------------------------------------------------------------------------- */
-
-.input-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.input-card__header {
-  padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.input-card__title-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.input-card__title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.input-card__title-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.input-card--base .input-card__title-dot {
-  background-color: var(--color-primary);
-}
-
-.input-card--target .input-card__title-dot {
-  background-color: var(--status-mismatch);
-}
-
-.input-card__hint {
-  font-size: var(--text-xs);
-  font-family: var(--font-code);
-  color: var(--color-text-secondary);
-}
-
-.input-card__body {
-  padding: var(--space-4) var(--space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-/* --- Dropzone --- */
-
-.dropzone {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg);
-  padding: var(--space-5);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  cursor: pointer;
-  transition: border-color var(--transition-base), background-color var(--transition-base);
-}
-
-.dropzone:hover {
-  border-color: var(--color-primary-light);
-  background-color: color-mix(in srgb, var(--color-primary) 4%, var(--color-bg));
-}
-
-.dropzone__icon {
-  color: var(--color-text-secondary);
-  opacity: 0.7;
-}
-
-.dropzone__text {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-
-.dropzone__text strong {
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.dropzone__file-btn {
-  font-size: var(--text-sm);
-  color: var(--color-primary);
-  font-weight: 500;
-  background: none;
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-4);
-  cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-  font-family: var(--font-ui);
-}
-
-.dropzone__file-btn:hover {
-  background-color: var(--color-primary);
-  color: #fff;
-}
-
-.dropzone__file-btn:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* --- Textarea Label --- */
-
-.textarea-label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  display: block;
-  margin-bottom: var(--space-1);
-}
-
-/* --- Textarea --- */
-
-.env-textarea {
-  width: 100%;
-  min-height: 180px;
-  padding: var(--space-3) var(--space-4);
-  font-family: var(--font-code);
-  font-size: var(--text-sm);
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  resize: vertical;
-  line-height: 1.6;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  overflow-x: auto;
-}
-
-.env-textarea::placeholder {
-  color: var(--color-text-secondary);
-  opacity: 0.7;
-}
-
-.env-textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
-}
-
-/* --------------------------------------------------------------------------
-   9. Action Bar (Bandingkan & Hapus Semua)
-   -------------------------------------------------------------------------- */
-
-.action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-7);
-  flex-wrap: wrap;
-}
-
-/* --- Buttons --- */
-
-.btn {
+/* Tombol bersama lintas halaman (.site-) */
+.site-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -458,638 +444,48 @@ body {
   font-family: var(--font-ui);
   font-size: var(--text-base);
   font-weight: 600;
-  border: none;
   border-radius: var(--radius-md);
-  cursor: pointer;
   text-decoration: none;
+  cursor: pointer;
+  border: none;
   transition: background-color var(--transition-fast), color var(--transition-fast),
-              box-shadow var(--transition-fast), opacity var(--transition-fast);
+              border-color var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
-.btn:focus-visible {
+.site-btn:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Primary */
-.btn--primary {
+.site-btn--primary {
   background-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   box-shadow: var(--shadow-sm);
 }
 
-.btn--primary:hover:not(:disabled) {
+.site-btn--primary:hover {
   background-color: color-mix(in srgb, var(--color-primary) 85%, #000);
   box-shadow: var(--shadow-md);
 }
 
-.btn--primary:disabled {
-  background-color: var(--color-border);
-  color: var(--color-text-secondary);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* Secondary / Ghost */
-.btn--secondary {
+.site-btn--secondary {
   background-color: transparent;
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
 }
 
-.btn--secondary:hover:not(:disabled) {
+.site-btn--secondary:hover {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   border-color: var(--color-text-secondary);
 }
 
-.btn--secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Small */
-.btn--sm {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-}
-
 /* --------------------------------------------------------------------------
-   10. Results Section & Diff Board (Milestone 4)
+   7. Footer global — .site-
    -------------------------------------------------------------------------- */
 
-.results-section {
-  display: none; /* Ditampilkan oleh JS setelah komparasi */
-  margin-top: var(--space-2);
-}
-
-.results-section.is-visible {
-  display: block;
-}
-
-/* --- Layout Hasil Komparasi --- */
-.results-layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: var(--space-5);
-  align-items: start;
-}
-
-/* --- Banner Peringatan Parsing (Warnings Banner) --- */
-.warnings-banner {
-  background-color: var(--status-orphan-bg);
-  border: 1px solid color-mix(in srgb, var(--status-orphan) 35%, transparent);
-  border-left: 4px solid var(--status-orphan);
-  border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
-  margin-bottom: var(--space-5);
-}
-
-.warnings-banner__header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
-}
-
-.warnings-banner__title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--status-orphan-text);
-}
-
-.warnings-banner__desc {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  margin-bottom: var(--space-3);
-}
-
-.warnings-banner__list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.warnings-banner__item {
-  font-size: var(--text-xs);
-  font-family: var(--font-code);
-  color: var(--status-orphan-text);
-  background-color: color-mix(in srgb, var(--status-orphan) 10%, #fff);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-3);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.warnings-banner__tag {
-  font-weight: 700;
-  padding: 1px 4px;
-  border-radius: 3px;
-  background-color: color-mix(in srgb, var(--status-orphan) 25%, transparent);
-}
-
-/* --- Banner Struktur Cocok Sempurna (No Difference Banner) --- */
-.no-difference-banner {
-  background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border));
-  border-left: 4px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-5);
-  margin-bottom: var(--space-5);
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.no-difference-banner__icon {
-  color: var(--color-primary);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.no-difference-banner__title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-bottom: var(--space-1);
-}
-
-.no-difference-banner__desc {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-
-/* --- Papan Komparasi Dua Panel (Side-by-Side Diff Board) --- */
-.diff-board-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.diff-board-card__header {
-  padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: color-mix(in srgb, var(--color-bg) 60%, var(--color-surface));
-}
-
-.diff-board-card__title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.diff-board-card__subtitle {
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  font-family: var(--font-code);
-}
-
-.diff-board-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 240px;
-}
-
-.diff-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.diff-column--base {
-  border-right: 1px solid var(--color-border);
-}
-
-.diff-column--target {
-  background-color: var(--color-surface);
-}
-
-.diff-column__header {
-  padding: var(--space-3) var(--space-4);
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  color: var(--color-text-primary);
-}
-
-.diff-column__count {
-  font-size: var(--text-xs);
-  font-family: var(--font-code);
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  background-color: var(--color-surface);
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-}
-
-.diff-column__list {
-  display: flex;
-  flex-direction: column;
-  list-style: none;
-  flex: 1;
-}
-
-/* --- Baris Komparasi (Diff Row) --- */
-.diff-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  min-height: 52px;
-  font-size: var(--text-sm);
-  gap: var(--space-2);
-  transition: background-color var(--transition-fast);
-}
-
-.diff-row:last-child {
-  border-bottom: none;
-}
-
-.diff-row:hover:not(.diff-row--empty) {
-  filter: brightness(0.98);
-}
-
-.diff-row__left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.diff-row__line {
-  font-family: var(--font-code);
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  background-color: var(--color-bg);
-  padding: 1px 6px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
-}
-
-.diff-row__key {
-  font-family: var(--font-code);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  word-break: break-all;
-}
-
-.diff-row__value-mask {
-  font-family: var(--font-code);
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  opacity: 0.55;
-  user-select: none;
-}
-
-.diff-row__badges {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-/* Row Variants */
-.diff-row--missing {
-  border-left: 3px solid var(--status-missing);
-  background-color: var(--status-missing-bg);
-}
-
-.diff-row--orphan {
-  border-left: 3px solid var(--status-orphan);
-  background-color: var(--status-orphan-bg);
-}
-
-.diff-row--mismatch {
-  border-left: 3px solid var(--status-mismatch);
-  background-color: var(--status-mismatch-bg);
-}
-
-.diff-row--match {
-  border-left: 3px solid transparent;
-  background-color: var(--color-surface);
-}
-
-.diff-row--empty {
-  background-color: color-mix(in srgb, var(--color-border) 25%, var(--color-bg));
-  color: var(--color-text-secondary);
-  font-style: italic;
-  font-size: var(--text-xs);
-  justify-content: center;
-  opacity: 0.65;
-  border-left: 3px dashed var(--color-border);
-}
-
-/* --- Badges --- */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-}
-
-.badge--missing {
-  background-color: color-mix(in srgb, var(--status-missing) 15%, transparent);
-  color: var(--status-missing-text);
-  border: 1px solid color-mix(in srgb, var(--status-missing) 35%, transparent);
-}
-
-.badge--orphan {
-  background-color: color-mix(in srgb, var(--status-orphan) 18%, transparent);
-  color: var(--status-orphan-text);
-  border: 1px solid color-mix(in srgb, var(--status-orphan) 35%, transparent);
-}
-
-.badge--duplicate {
-  background-color: var(--status-duplicate-bg);
-  color: var(--status-duplicate-text);
-  border: 1px solid color-mix(in srgb, var(--status-duplicate) 35%, transparent);
-}
-
-.badge--mismatch {
-  background-color: var(--status-mismatch-bg);
-  color: var(--status-mismatch-text);
-  border: 1px solid color-mix(in srgb, var(--status-mismatch) 35%, transparent);
-}
-
-.badge--match {
-  background-color: var(--color-bg);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-}
-
-/* --- Sidebar Panel Ringkasan & Aksi --- */
-.results-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.summary-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  box-shadow: var(--shadow-sm);
-}
-
-.summary-card__title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.summary-stat-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
-}
-
-.summary-stat-box {
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  transition: transform var(--transition-fast);
-}
-
-.summary-stat-box:hover {
-  transform: translateY(-1px);
-}
-
-.summary-stat-box--missing {
-  border-top: 3px solid var(--status-missing);
-  background-color: var(--status-missing-bg);
-}
-
-.summary-stat-box--orphan {
-  border-top: 3px solid var(--status-orphan);
-  background-color: var(--status-orphan-bg);
-}
-
-.summary-stat-box--duplicate {
-  border-top: 3px solid var(--status-duplicate);
-  background-color: var(--status-duplicate-bg);
-}
-
-.summary-stat-box--mismatch {
-  border-top: 3px solid var(--status-mismatch);
-  background-color: var(--status-mismatch-bg);
-}
-
-.summary-stat-box__num {
-  font-size: var(--heading-lg);
-  font-weight: 700;
-  line-height: 1.1;
-  font-family: var(--font-code);
-}
-
-.summary-stat-box--missing .summary-stat-box__num { color: var(--status-missing-text); }
-.summary-stat-box--orphan .summary-stat-box__num { color: var(--status-orphan-text); }
-.summary-stat-box--duplicate .summary-stat-box__num { color: var(--status-duplicate-text); }
-.summary-stat-box--mismatch .summary-stat-box__num { color: var(--status-mismatch-text); }
-
-.summary-stat-box__label {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.summary-stat-box__desc {
-  font-size: 0.7rem;
-  color: var(--color-text-secondary);
-  opacity: 0.8;
-  line-height: 1.3;
-}
-
-/* --- Action Box dalam Sidebar --- */
-.sidebar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
-
-.sidebar-actions .btn {
-  width: 100%;
-  justify-content: center;
-}
-
-/* Feedback Box untuk Aksi Output (Milestone 5) */
-.sidebar-feedback-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.sidebar-feedback {
-  font-size: var(--text-xs);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  line-height: 1.4;
-  margin-top: var(--space-2);
-  animation: feedbackFadeIn 150ms ease;
-}
-
-.sidebar-feedback--success {
-  background-color: color-mix(in srgb, var(--color-primary) 12%, #fff);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
-  color: var(--color-primary);
-  font-weight: 500;
-}
-
-.sidebar-feedback--info {
-  background-color: var(--status-mismatch-bg);
-  border: 1px solid color-mix(in srgb, var(--status-mismatch) 30%, transparent);
-  color: var(--status-mismatch-text);
-}
-
-.sidebar-feedback--error {
-  background-color: var(--status-missing-bg);
-  border: 1px solid color-mix(in srgb, var(--status-missing) 30%, transparent);
-  color: var(--status-missing-text);
-}
-
-@keyframes feedbackFadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Mini Privacy Box dalam Sidebar --- */
-.sidebar-privacy {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-3);
-  margin-top: var(--space-2);
-  line-height: 1.4;
-}
-
-.sidebar-privacy svg {
-  flex-shrink: 0;
-  color: var(--color-primary);
-}
-
-/* --------------------------------------------------------------------------
-   11. Empty State
-   -------------------------------------------------------------------------- */
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-7) var(--space-5);
-  text-align: center;
-  background-color: var(--color-surface);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-xl);
-  min-height: 280px;
-}
-
-.empty-state__icon {
-  color: var(--color-primary-light);
-  opacity: 0.7;
-}
-
-.empty-state__title {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.empty-state__description {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  max-width: 400px;
-  line-height: 1.6;
-}
-
-.empty-state__steps {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: var(--space-2);
-}
-
-.empty-state__step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-.empty-state__step-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background-color: var(--color-primary);
-  color: #fff;
-  font-size: var(--text-xs);
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.empty-state__step-sep {
-  color: var(--color-border);
-  font-size: var(--text-lg);
-  user-select: none;
-}
-
-/* --------------------------------------------------------------------------
-   12. Footer
-   -------------------------------------------------------------------------- */
-
-.footer {
+.site-footer {
   border-top: 1px solid var(--color-border);
   background-color: var(--color-surface);
   padding: var(--space-4) var(--space-5);
@@ -1098,181 +494,38 @@ body {
   color: var(--color-text-secondary);
 }
 
-.footer__inner {
+.site-footer__inner {
   max-width: var(--container-width);
   margin: 0 auto;
 }
 
 /* --------------------------------------------------------------------------
-   13. Dropzone — State Tambahan (Milestone 2)
+   8. Responsivitas navbar & fondasi
    -------------------------------------------------------------------------- */
 
-/* Drag-over: border solid + background aksen */
-.dropzone--drag-over {
-  border-color: var(--color-primary);
-  border-style: solid;
-  background-color: color-mix(in srgb, var(--color-primary) 6%, var(--color-bg));
-}
-
-/* Loaded: border solid hijau + teks berubah */
-.dropzone--loaded {
-  border-color: var(--color-primary-light);
-  border-style: solid;
-  cursor: default;
-}
-
-.dropzone--loaded:hover {
-  border-color: var(--color-primary);
-  background-color: color-mix(in srgb, var(--color-primary) 4%, var(--color-bg));
-}
-
-.dropzone__icon--success {
-  color: var(--color-primary);
-}
-
-.dropzone__text--loaded {
-  color: var(--color-text-primary);
-}
-
-/* Error: border merah */
-.dropzone--error {
-  border-color: var(--status-missing);
-  border-style: solid;
-  background-color: var(--status-missing-bg);
-}
-
-.dropzone__icon--error {
-  color: var(--status-missing);
-}
-
-.dropzone__text--error {
-  color: var(--status-missing-text);
-}
-
-/* --------------------------------------------------------------------------
-   14. Input Card — File Tag & Clear Button (Milestone 2)
-   -------------------------------------------------------------------------- */
-
-/* File tag: nama file yang dipilih, tampil di header kartu */
-.input-card__file-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  max-width: 220px;
-  font-size: var(--text-xs);
-  font-family: var(--font-code);
-  color: var(--color-primary);
-  background-color: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border));
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Tombol × di dalam file-tag */
-.input-card__clear-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  background: none;
-  border: none;
-  border-radius: 50%;
-  color: var(--color-primary);
-  font-size: var(--text-sm);
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--font-ui);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.input-card__clear-btn:hover {
-  background-color: color-mix(in srgb, var(--status-missing) 15%, transparent);
-  color: var(--status-missing-text);
-}
-
-.input-card__clear-btn:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
-}
-
-/* Kartu dalam kondisi has-file: sedikit aksen hijau di border kiri */
-.input-card--has-file {
-  border-left: 3px solid var(--color-primary-light);
-}
-
-/* --------------------------------------------------------------------------
-   15. Responsivitas
-   -------------------------------------------------------------------------- */
-
-/* --- Tablet: ≤ 900px --- */
 @media (max-width: 900px) {
-  .input-section__grid {
-    grid-template-columns: 1fr;
+  .site-navbar__inner {
+    padding: 0 var(--space-4);
+    gap: var(--space-3);
   }
 
-  .results-layout {
-    grid-template-columns: 1fr;
+  .site-navbar__controls {
+    gap: var(--space-3);
   }
 }
 
-/* --- Mobile: ≤ 600px --- */
 @media (max-width: 600px) {
-  .main {
-    padding: var(--space-5) var(--space-4);
+  .site-main {
+    padding: var(--space-5) var(--space-4) var(--space-6);
   }
 
-  .navbar__inner {
-    padding: 0 var(--space-4);
-  }
-
-  .input-card__header {
-    padding: var(--space-3) var(--space-4);
-  }
-
-  .input-card__body {
-    padding: var(--space-3) var(--space-4);
-  }
-
-  .action-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .action-bar .btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .diff-board-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .diff-column--base {
-    border-right: none;
-    border-bottom: 2px solid var(--color-border);
-  }
-
-  .summary-stat-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .empty-state {
-    padding: var(--space-6) var(--space-4);
-    min-height: 220px;
-  }
-
-  .empty-state__steps {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .empty-state__step-sep {
+  /* Indikator privasi disembunyikan di layar sangat sempit agar kontrol
+     bahasa/tema tidak terdesak; aksesibilitas tetap terjaga. */
+  .site-navbar__indicator {
     display: none;
+  }
+
+  .site-nav__link {
+    padding: var(--space-2) var(--space-2);
   }
 }
