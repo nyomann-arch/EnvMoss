@@ -20,6 +20,16 @@ EnvMoss is a static web developer utility that helps developers compare two envi
 
 ---
 
+## Site Pages
+
+EnvMoss is a small multi-page static site:
+
+- **Landing (`/`)** — overview of what EnvMoss does, the four result statuses, and the privacy promise.
+- **Tool (`/app/`)** — the comparison utility itself: enter Base and Target `.env` files and inspect the results.
+- **Guide (`/guide/`)** — step-by-step usage guide, supported syntax, and troubleshooting.
+
+---
+
 ## The Problem It Solves
 
 In software development, developers often manage multiple environment files (such as `.env.example`, `.env.local`, `.env.staging`, and `.env.production`). Differences in structure between these files frequently cause issues:

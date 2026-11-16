@@ -20,6 +20,16 @@ EnvMoss adalah developer utility tool berbasis web statis yang membantu develope
 
 ---
 
+## Halaman Situs
+
+EnvMoss adalah situs statis multi-halaman yang ringkas:
+
+- **Landing (`/`)** — gambaran umum tentang EnvMoss, empat status hasil, dan komitmen privasi.
+- **Tool (`/app/`)** — utilitas komparasi itu sendiri: masukkan file `.env` Base dan Target lalu periksa hasilnya.
+- **Guide (`/guide/`)** — panduan penggunaan langkah demi langkah, sintaks yang didukung, dan pemecahan masalah.
+
+---
+
 ## Masalah yang Diselesaikan
 
 Dalam pengembangan perangkat lunak, developer sering mengelola beberapa file environment (seperti `.env.example`, `.env.local`, `.env.staging`, dan `.env.production`). Perbedaan struktur di antara file-file tersebut kerap memicu kendala:
