@@ -57,7 +57,7 @@ export function isValidKeyName(key) {
  *
  * @param {string} rawLine - Isi baris mentah
  * @param {number} lineNumber - Nomor baris (1-based)
- * @returns {{ type: 'empty' } | { type: 'comment' } | { type: 'entry', key: string, value: string, line: number } | { type: 'warning', line: number, reason: string }}
+ * @returns {{ type: 'empty' } | { type: 'comment' } | { type: 'entry', key: string, value: string, line: number } | { type: 'warning', line: number, reason: string, reasonKey: string }}
  */
 function parseLine(rawLine, lineNumber) {
   // 1. Abaikan baris kosong
@@ -83,7 +83,8 @@ function parseLine(rawLine, lineNumber) {
     return {
       type: 'warning',
       line: lineNumber,
-      reason: "Format assignment tidak dikenali: tidak ditemukan pemisah '='"
+      reason: "Format assignment tidak dikenali: tidak ditemukan pemisah '='",
+      reasonKey: 'engine.warn.noEquals'
     };
   }
 
@@ -93,7 +94,8 @@ function parseLine(rawLine, lineNumber) {
     return {
       type: 'warning',
       line: lineNumber,
-      reason: 'Nama key tidak valid: harus diawali huruf/underscore dan hanya memuat karakter alfanumerik, underscore, titik, atau tanda hubung'
+      reason: 'Nama key tidak valid: harus diawali huruf/underscore dan hanya memuat karakter alfanumerik, underscore, titik, atau tanda hubung',
+      reasonKey: 'engine.warn.invalidKey'
     };
   }
 
@@ -110,7 +112,8 @@ function parseLine(rawLine, lineNumber) {
       return {
         type: 'warning',
         line: lineNumber,
-        reason: 'Tanda petik ganda pembuka tidak ditutup'
+        reason: 'Tanda petik ganda pembuka tidak ditutup',
+        reasonKey: 'engine.warn.unclosedDouble'
       };
     }
 
@@ -123,7 +126,8 @@ function parseLine(rawLine, lineNumber) {
       return {
         type: 'warning',
         line: lineNumber,
-        reason: 'Terdapat teks tambahan yang tidak valid setelah tanda petik penutup'
+        reason: 'Terdapat teks tambahan yang tidak valid setelah tanda petik penutup',
+        reasonKey: 'engine.warn.trailingAfterQuote'
       };
     }
 
@@ -134,7 +138,8 @@ function parseLine(rawLine, lineNumber) {
       return {
         type: 'warning',
         line: lineNumber,
-        reason: 'Tanda petik tunggal pembuka tidak ditutup'
+        reason: 'Tanda petik tunggal pembuka tidak ditutup',
+        reasonKey: 'engine.warn.unclosedSingle'
       };
     }
 
@@ -146,7 +151,8 @@ function parseLine(rawLine, lineNumber) {
       return {
         type: 'warning',
         line: lineNumber,
-        reason: 'Terdapat teks tambahan yang tidak valid setelah tanda petik penutup'
+        reason: 'Terdapat teks tambahan yang tidak valid setelah tanda petik penutup',
+        reasonKey: 'engine.warn.trailingAfterQuote'
       };
     }
 
@@ -183,7 +189,7 @@ function parseLine(rawLine, lineNumber) {
  *   entries: Array<{ key: string, value: string, line: number }>,
  *   keys: Map<string, { key: string, count: number, lines: number[], effectiveValue: string, firstLine: number, lastLine: number }>,
  *   duplicates: Array<{ key: string, count: number, lines: number[] }>,
- *   warnings: Array<{ side: string, line: number, reason: string }>
+ *   warnings: Array<{ side: string, line: number, reason: string, reasonKey: string }>
  * }}
  */
 export function parseEnv(text, side = 'Base') {
@@ -203,7 +209,8 @@ export function parseEnv(text, side = 'Base') {
       warnings.push({
         side,
         line: result.line,
-        reason: result.reason
+        reason: result.reason,
+        reasonKey: result.reasonKey
       });
     } else if (result.type === 'entry') {
       entries.push({
@@ -283,8 +290,8 @@ export function parseEnv(text, side = 'Base') {
  *     target: Array<{ key: string, count: number, lines: number[] }>
  *   },
  *   warnings: {
- *     base: Array<{ side: string, line: number, reason: string }>,
- *     target: Array<{ side: string, line: number, reason: string }>
+ *     base: Array<{ side: string, line: number, reason: string, reasonKey: string }>,
+ *     target: Array<{ side: string, line: number, reason: string, reasonKey: string }>
  *   },
  *   board: {
  *     base: Array<{ key: string, line: number, lines: number[], status: 'Missing'|'Mismatch'|'Match', isDuplicate: boolean, duplicateCount: number }>,

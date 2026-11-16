@@ -98,7 +98,8 @@ assert(mergedComplex.endsWith('MISSING_X='), 'Key baru ditambahkan di paling baw
 
 console.log('\n--- 4. Cek Integrasi di app.js & styles.css ---');
 const appJs = fs.readFileSync('c:/envmoss/js/app.js', 'utf8');
-const stylesCss = fs.readFileSync('c:/envmoss/css/styles.css', 'utf8');
+// Sejak Milestone 7, style khusus Tool berada di css/tool.css
+const stylesCss = fs.readFileSync('c:/envmoss/css/tool.css', 'utf8');
 
 assert(appJs.includes('generateMarkdownChecklist'), 'app.js imports generateMarkdownChecklist');
 assert(appJs.includes('generateMergedEnv'), 'app.js imports generateMergedEnv');

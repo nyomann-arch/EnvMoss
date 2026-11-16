@@ -2,80 +2,81 @@
 
 > **Compare. Validate. Keep Your Secrets Local.**
 
-EnvMoss adalah developer utility tool berbasis web statis yang membantu developer membandingkan dua file environment (`.env`) secara lokal langsung di memori browser. EnvMoss mendeteksi ketidaksesuaian struktur konfigurasi, deklarasi duplikat, serta perbedaan nilai antar-environment tanpa pernah mengirimkan isi file atau kredensial Anda ke server.
+EnvMoss is a static web developer utility that helps developers compare two environment files (`.env`) locally, directly in browser memory. EnvMoss detects configuration structure mismatches, duplicate declarations, and value differences across environments without ever sending your file contents or credentials to a server.
 
 [![Live Demo](https://img.shields.io/badge/demo-envmoss.vercel.app-3D6B4F?style=flat-square)](https://envmoss.vercel.app/)
 [![GitHub Repository](https://img.shields.io/badge/github-nyomann--arch%2FEnvMoss-1A2E22?style=flat-square&logo=github)](https://github.com/nyomann-arch/EnvMoss)
 [![License: MIT](https://img.shields.io/badge/License-MIT-6B9B7A?style=flat-square)](LICENSE)
 
+🌐 **Language:** [English](README.md) · [Bahasa Indonesia](README.id.md)
 
 ---
 
-## Tautan Cepat
+## Quick Links
 
 - **Live Application:** [https://envmoss.vercel.app/](https://envmoss.vercel.app/)
 - **Source Code:** [https://github.com/nyomann-arch/EnvMoss](https://github.com/nyomann-arch/EnvMoss)
-- **Lisensi:** [MIT License](LICENSE)
+- **License:** [MIT License](LICENSE)
 
 ---
 
-## Masalah yang Diselesaikan
+## The Problem It Solves
 
-Dalam pengembangan perangkat lunak, developer sering mengelola beberapa file environment (seperti `.env.example`, `.env.local`, `.env.staging`, dan `.env.production`). Perbedaan struktur di antara file-file tersebut kerap memicu kendala:
+In software development, developers often manage multiple environment files (such as `.env.example`, `.env.local`, `.env.staging`, and `.env.production`). Differences in structure between these files frequently cause issues:
 
-- Key baru yang ditambahkan di `.env.example` terlewat dan belum didefinisikan di environment lokal atau staging.
-- Terdapat key tambahan di server target yang tidak terdokumentasi di repository.
-- Variabel yang sama tidak sengaja dideklarasikan berulang kali dalam satu file.
-- Menggunakan diff tool online konvensional berisiko tinggi membocorkan API key, password database, dan kredensial rahasia ke server pihak ketiga.
+- New keys added to `.env.example` are missed and never defined in the local or staging environment.
+- Extra keys exist on the target server that are not documented in the repository.
+- The same variable is accidentally declared multiple times within a single file.
+- Using a conventional online diff tool risks leaking API keys, database passwords, and other secrets to third-party servers.
 
-EnvMoss menyelesaikan masalah tersebut dengan menyediakan sarana inspeksi struktur yang cepat, informatif, dan sepenuhnya berjalan di sisi klien (*client-side*).
+EnvMoss solves these problems by providing a fast, informative structure inspection tool that runs entirely on the client side.
 
 ---
 
-## Fitur Utama
+## Key Features
 
 ### 1. Dual Environment Input
-Mendukung perbandingan dua file environment secara berdampingan:
-- **Base Environment:** Berkas acuan, umumnya `.env.example`.
-- **Target Environment:** Berkas yang diperiksa, misalnya `.env.local` atau `.env.production`.
+Compares two environment files side by side:
+- **Base Environment:** The reference file, usually `.env.example`.
+- **Target Environment:** The file being inspected, such as `.env.local` or `.env.production`.
 
-Setiap slot input menyediakan tiga metode input fleksibel:
-- **Drag-and-Drop:** Tarik dan lepas file langsung ke area dropzone.
-- **File Picker:** Pilih file dari direktori perangkat melalui tombol pemilih berkas.
-- **Textarea Editor:** Salin-tempel atau edit teks secara langsung. Textarea berfungsi sebagai *single source of truth* untuk proses komparasi.
+Each input slot offers three flexible input methods:
+- **Drag-and-Drop:** Drag and drop a file directly onto the dropzone.
+- **File Picker:** Choose a file from your device through the file picker button.
+- **Textarea Editor:** Paste or edit text directly. The textarea acts as the *single source of truth* for the comparison process.
 
 ### 2. Four-State Comparison Engine
-Engine komparasi EnvMoss memproses struktur variabel dan mengelompokkan temuan ke dalam empat status utama:
+The EnvMoss comparison engine processes variable structure and groups findings into four primary statuses:
 
-| Status | Indikator | Arti & Penjelasan Teknis |
+| Status | Indicator | Meaning & Technical Explanation |
 |---|---|---|
-| **Missing** | 🔴 Merah | Key terdaftar di Base tetapi tidak ditemukan di Target. Perlu ditambahkan ke environment Target. |
-| **Orphan / Extra** | 🟡 Kuning | Key ada di Target tetapi tidak ditemukan di Base. Menandakan konfigurasi spesifik environment dan tidak otomatis berarti key usang. |
-| **Duplicate** | 🟠 Jingga | Key yang sama dideklarasikan lebih dari satu kali dalam file yang sama. Duplikasi dicatat per kelompok key per file, dengan aturan *last declaration wins* untuk penentuan nilai efektif. |
-| **Mismatch** | 🔵 Biru | Key tersedia di kedua file, namun nilai efektifnya berbeda. Kondisi ini adalah informasi perbedaan konfigurasi yang wajar antar-environment, bukan sebuah error. |
-| **Match** | ⚪ Netral | Key dan nilai efektif sama persis di kedua file. |
+| **Missing** | 🔴 Red | Key exists in Base but is not found in Target. Needs to be added to the Target environment. |
+| **Orphan / Extra** | 🟡 Yellow | Key exists in Target but is not found in Base. Indicates environment-specific configuration and is not automatically considered a stale key. |
+| **Duplicate** | 🟠 Orange | The same key is declared more than once in the same file. Duplicates are recorded per key group per file, with a *last declaration wins* rule for the effective value. |
+| **Mismatch** | 🔵 Blue | Key exists in both files but has a different effective value. This is informational about configuration differences across environments, not an error. |
+| **Match** | ⚪ Neutral | Key and effective value are identical in both files. |
 
 ### 3. Side-by-Side Diff Board
-Hasil komparasi ditampilkan dalam dua panel sejajar (Base di kiri, Target di kanan) dengan baris yang saling dipetakan (*aligned rows*):
-- Dilengkapi penomoran baris kemunculan asli (`L${baris}`) dan badge status berwarna.
-- Jika suatu key berstatus Missing, sisi Target menampilkan penanda slot kosong `— Tidak ditemukan di Target —`.
-- Jika suatu key berstatus Orphan, sisi Base menampilkan penanda slot kosong `— Tidak terdaftar di Base —`.
-- **Privasi Nilai:** Nilai asli variabel **tidak pernah ditampilkan** pada papan komparasi. Seluruh nilai disamarkan menggunakan placeholder penyamaran `= [nilai disembunyikan]`.
+Comparison results are displayed in two aligned panels (Base on the left, Target on the right) with mapped rows:
+- Includes original line numbers (`L${line}`) and colored status badges.
+- When a key is Missing, the Target side shows an empty slot marker `— Not found in Target —`.
+- When a key is Orphan, the Base side shows an empty slot marker `— Not registered in Base —`.
+- **Value Privacy:** Actual variable values are **never displayed** on the comparison board. All values are masked with the placeholder `= [value hidden]`.
 
-### 4. Parsing Warnings Terisolasi
-Jika file memuat baris yang tidak memenuhi standar format `.env` yang didukung, EnvMoss tidak mengabaikannya diam-diam:
-- Menampilkan kotak peringatan terpisah yang memuat sisi file dan nomor baris terkait.
-- Tidak menyertakan isi teks mentah baris pada pesan peringatan agar rahasia tidak bocor.
-- Baris yang menghasilkan peringatan diisolasi dan tidak diikutsertakan ke dalam analisis key.
+### 4. Isolated Parsing Warnings
+If a file contains lines that do not meet the supported `.env` format, EnvMoss does not silently ignore them:
+- Displays a separate warning box containing the file side and relevant line number.
+- Does not include the raw line text in the warning message so secrets cannot leak.
+- Lines that produce warnings are isolated and excluded from key analysis.
 
 ---
 
 ## Actionable Outputs
 
-Setelah melakukan komparasi, EnvMoss menyediakan dua aksi lanjutan yang dapat langsung digunakan dalam alur kerja developer:
+After running a comparison, EnvMoss provides two follow-up actions that can be used directly in your development workflow:
 
-### 1. Salin Markdown Checklist
-Menghasilkan daftar tugas Markdown yang hanya memuat key berstatus **Missing** tanpa menyertakan nilai rahasia:
+### 1. Copy Markdown Checklist
+Generates a Markdown task list containing only **Missing** keys without including secret values:
 
 ```markdown
 ## Checklist Environment
@@ -84,161 +85,174 @@ Menghasilkan daftar tugas Markdown yang hanya memuat key berstatus **Missing** t
 - [ ] Tambahkan `DATABASE_URL` ke Target Environment
 ```
 
-- Disalin langsung ke clipboard perangkat via Clipboard API.
-- Tombol otomatis dinonaktifkan jika tidak ada key Missing untuk mencegah penyalinan daftar kosong.
+- Copied directly to the device clipboard via the Clipboard API.
+- The button is automatically disabled when there are no Missing keys to prevent copying a misleading empty list.
+- The checklist language follows the active interface language (English or Bahasa Indonesia).
 
-### 2. Unduh Merged `.env`
-Menghasilkan file konfigurasi baru bernama `envmoss-merged.env` secara lokal melalui Blob API:
-- **Menjaga Keaslian Target:** Seluruh konten asli Target dipertahankan 100% tanpa perubahan sebagai prefix (termasuk komentar, spasi kosong, dan duplikasi yang sudah ada).
-- **Penambahan Key Missing:** Setiap key Missing ditambahkan satu kali di bagian paling bawah dengan nilai kosong (`KEY=`), diawali komentar penanda `# Ditambahkan oleh EnvMoss: key yang Missing`.
-- **Konsistensi Format:** Mengikuti gaya pemisah baris asli Target (`CRLF` atau `LF`).
-- **Tanpa Missing:** Jika tidak ada key Missing, hasil unduhan identik persis dengan file Target asli tanpa penambahan komentar penanda.
-- *Pengingat:* Developer disarankan melengkapi nilai variabel kosong tersebut sebelum file digunakan pada aplikasi.
-
----
-
-## Cara Menggunakan (Quick Usage)
-
-1. Buka [https://envmoss.vercel.app/](https://envmoss.vercel.app/) pada browser Anda.
-2. Masukkan file acuan (misalnya `.env.example`) pada kartu **Base Environment** via drag-and-drop, tombol **Pilih File**, atau paste ke textarea.
-3. Masukkan file target (misalnya `.env.local` atau `.env.production`) pada kartu **Target Environment**.
-4. Klik tombol **Bandingkan** untuk menjalankan komparasi lokal.
-5. Periksa ringkasan status dan telusuri perbedaan pada **Papan Komparasi**.
-6. Gunakan tombol **Salin Markdown Checklist** untuk mencatat to-do list, atau klik **Unduh Merged .env** untuk mendapatkan file target yang telah dilengkapi.
-7. Gunakan tombol **Hapus Semua** untuk membersihkan seluruh input, hasil, dan state dari memori halaman.
+### 2. Download Merged `.env`
+Generates a new configuration file named `envmoss-merged.env` locally via the Blob API:
+- **Preserves Target Integrity:** The entire original Target content is preserved 100% unchanged as a prefix (including comments, blank lines, and existing duplicates).
+- **Missing Key Addition:** Each Missing key is appended once at the bottom with an empty value (`KEY=`), preceded by a marker comment.
+- **Format Consistency:** Follows the original Target line-ending style (`CRLF` or `LF`).
+- **No Missing Keys:** If there are no Missing keys, the download is identical to the original Target file with no marker comment.
+- *Reminder:* You should fill in the empty variable values before using the file in your application.
 
 ---
 
-## Batasan & Kompatibilitas Parsing
+## How to Use (Quick Usage)
 
-EnvMoss menggunakan parser internal sederhana dan deterministik yang dirancang khusus untuk kebutuhan komparasi struktur. Parser mendukung:
+1. Open [https://envmoss.vercel.app/](https://envmoss.vercel.app/) in your browser.
+2. Enter the reference file (e.g. `.env.example`) in the **Base Environment** card via drag-and-drop, the **Choose File** button, or paste into the textarea.
+3. Enter the target file (e.g. `.env.local` or `.env.production`) in the **Target Environment** card.
+4. Click the **Compare** button to run the local comparison.
+5. Review the status summary and inspect differences on the **Comparison Board**.
+6. Use **Copy Markdown Checklist** to record a to-do list, or click **Download Merged .env** to get a target file completed with missing keys.
+7. Use **Clear All** to wipe all inputs, results, and state from page memory.
 
-- Format penugasan standar `KEY=value` dan `export KEY=value`.
-- Baris kosong dan komentar penuh yang diawali karakter `#`.
-- Karakter whitespace di sekitar tanda `=` (dipangkas otomatis).
-- Validasi nama key: harus diawali huruf atau underscore, dan hanya berisi karakter alfanumerik, underscore, titik, atau tanda hubung (`^[A-Za-z_][A-Za-z0-9_.-]*$`).
-- Nama key bersifat *case-sensitive* (`API_KEY` berbeda dengan `api_key`).
-- Nilai kosong (`API_KEY=`).
-- Nilai berpetik tunggal (`'...'`) dan ganda (`"..."`). Tanda kutip dilepas dan isi di dalamnya diperlakukan secara literal (tanda `#` di dalam kutipan dianggap bagian dari nilai).
-- Inline comment pada nilai tanpa tanda petik yang didahului spasi (`\s+#`). Karakter `#` pada URL (seperti `https://example.com/#section`) tetap dipertahankan sebagai nilai.
-- Pembersihan karakter UTF-8 BOM (`\uFEFF`) di awal file.
-- Normalisasi pemisah baris LF (`\n`), CRLF (`\r\n`), dan CR (`\r`).
-
-**Batasan (Belum Didukung di MVP v1.0):**
-- Multiline values (nilai yang membentang di beberapa baris).
-- Variable interpolation (ekspansi variabel seperti `${HOST}:${PORT}`).
-- *Catatan:* EnvMoss tidak mengklaim kompatibilitas penuh dengan seluruh variasi implementasi pustaka `dotenv` atau shell parser eksternal. Baris yang tidak memenuhi format di atas akan menghasilkan *Parsing Warning*.
+The interface is available in English and Bahasa Indonesia — switch anytime from the EN/ID control in the navbar; your choice is remembered on this device.
 
 ---
 
-## Privasi dan Keamanan
+## Parsing Limits & Compatibility
 
-EnvMoss memegang prinsip *privacy-first* secara ketat:
+EnvMoss uses a simple, deterministic internal parser designed specifically for structure comparison. The parser supports:
 
-- **Pemrosesan 100% Client-Side:** File dibaca menggunakan Browser File API (`FileReader`). Seluruh proses parsing, kalkulasi komparasi, dan pembuatan file output dieksekusi di memori browser pengguna.
-- **Tanpa Backend & API:** Tidak ada server backend, endpoint API pemrosesan, database, atau layanan analitik/telemetri pihak ketiga.
-- **Bebas Penyimpanan Permanen:** Isi file, nama key, dan nilai tidak pernah disimpan ke dalam `localStorage`, `sessionStorage`, `IndexedDB`, maupun cookies. Data hanya berada di memori tab aktif dan akan terhapus saat tab ditutup, di-refresh, atau saat tombol **Hapus Semua** ditekan.
-- **Proteksi Nilai Variabel:** Nilai environment variable tidak pernah dicetak ke antarmuka komparasi, tidak dicatat ke `console.log`, dan tidak dimasukkan ke dalam Markdown Checklist.
-- **Pernyataan Privasi:**
-  > *"File `.env` Anda diproses secara lokal di browser. EnvMoss tidak mengunggah isi file konfigurasi Anda ke server aplikasi."*
-- *Catatan Transparansi:* Saat Anda pertama kali membuka website EnvMoss, browser Anda mengunduh aset statis (HTML, CSS, JS) dari hosting Vercel. Pemuatan aset statis website ini sepenuhnya terpisah dari file `.env` Anda yang tidak pernah meninggalkan browser.
+- Standard assignment format `KEY=value` and `export KEY=value`.
+- Empty lines and full-line comments starting with `#`.
+- Whitespace around the `=` sign (trimmed automatically).
+- Key name validation: must start with a letter or underscore, and contain only alphanumeric characters, underscore, dot, or hyphen (`^[A-Za-z_][A-Za-z0-9_.-]*$`).
+- Case-sensitive key names (`API_KEY` differs from `api_key`).
+- Empty values (`API_KEY=`).
+- Single-quoted (`'...'`) and double-quoted (`"..."`) values. Quotes are stripped and content inside is treated literally (a `#` inside quotes is part of the value).
+- Inline comments on unquoted values preceded by whitespace (`\s+#`). A `#` in URLs (such as `https://example.com/#section`) is preserved as part of the value.
+- UTF-8 BOM (`\uFEFF`) removal at the start of the file.
+- Line-ending normalization for LF (`\n`), CRLF (`\r\n`), and CR (`\r`).
+
+**Limits (Not Supported in MVP v1.0):**
+- Multiline values (values spanning multiple lines).
+- Variable interpolation (expansion of variables such as `${HOST}:${PORT}`).
+- *Note:* EnvMoss does not claim full compatibility with every variation of `dotenv` library implementations or external shell parsers. Lines that do not meet the format above produce a *Parsing Warning*.
 
 ---
 
-## Teknologi yang Digunakan
+## Privacy & Security
 
-EnvMoss dibangun dengan arsitektur web modern yang ramping tanpa framework, tanpa bundler, dan tanpa dependensi runtime:
+EnvMoss strictly upholds *privacy-first* principles:
 
-| Komponen | Teknologi | Kegunaan |
+- **100% Client-Side Processing:** Files are read using the Browser File API (`FileReader`). All parsing, comparison calculation, and output file generation execute in the user's browser memory.
+- **No Backend & No API:** There is no backend server, processing API endpoint, database, or third-party analytics/telemetry service.
+- **No Persistent Storage:** File contents, key names, and values are never written to `localStorage`, `sessionStorage`, `IndexedDB`, or cookies. Data lives only in the active tab's memory and is cleared when the tab is closed, refreshed, or when **Clear All** is pressed. The only stored preferences are the UI language (`envmoss:language`) and theme (`envmoss:theme`) codes.
+- **Variable Value Protection:** Environment variable values are never printed to the comparison interface, never logged to `console.log`, and never included in the Markdown Checklist.
+- **Privacy Statement:**
+  > *"Your `.env` file is processed locally in your browser. EnvMoss does not upload your configuration file contents to any application server."*
+- *Transparency Note:* When you first open the EnvMoss website, your browser downloads static assets (HTML, CSS, JS) from Vercel hosting. Loading these static website assets is entirely separate from your `.env` files, which never leave your browser.
+
+---
+
+## Technology
+
+EnvMoss is built with a lean modern web architecture — no framework, no bundler, and no runtime dependencies:
+
+| Component | Technology | Purpose |
 |---|---|---|
-| **Struktur Markup** | HTML5 Semantik | Kerangka antarmuka yang aksesibel dan terstruktur |
-| **Styling** | CSS3 Murni (Custom Properties) | Design tokens, komponen UI bertema Moss, dan tata letak responsif |
-| **Logika Aplikasi** | Vanilla JavaScript (ES6+) | Manajemen interaksi pengguna dan manipulasi DOM |
-| **Arsitektur Kode** | JavaScript ES Modules bawaan | Pemisahan modul tanggung jawab kode yang rapi |
-| **Pembacaan Berkas** | Browser File API / FileReader | Membaca file lokal pengguna secara asinkron |
-| **Penyalinan Data** | Clipboard API | Menyalin Markdown Checklist ke clipboard |
-| **Pembuatan Berkas** | Blob API & Object URL | Menghasilkan file unduhan `envmoss-merged.env` secara lokal |
-| **Hosting Publik** | Vercel | Penyedia static web hosting untuk file web publik |
+| **Markup** | Semantic HTML5 | Accessible, structured interface skeleton |
+| **Styling** | Pure CSS3 (Custom Properties) | Design tokens, Moss-themed UI components, responsive layout |
+| **Application Logic** | Vanilla JavaScript (ES6+) | User interaction management and DOM manipulation |
+| **Code Architecture** | Native JavaScript ES Modules | Clean separation of code responsibilities |
+| **File Reading** | Browser File API / FileReader | Asynchronous reading of user-local files |
+| **Data Copying** | Clipboard API | Copying the Markdown Checklist to the clipboard |
+| **File Generation** | Blob API & Object URL | Producing the `envmoss-merged.env` download locally |
+| **Public Hosting** | Vercel | Static web hosting for public files |
 
 ---
 
-## Menjalankan Proyek Secara Lokal
+## Running the Project Locally
 
-Karena proyek menggunakan modul JavaScript bawaan browser (`<script type="module">`), disarankan menjalankan EnvMoss melalui local static HTTP server agar browser tidak membatasi pemuatan modul lokal karena kebijakan CORS.
+Because the project uses native browser JavaScript modules (`<script type="module">`), it is recommended to run EnvMoss through a local static HTTP server so the browser does not restrict module loading due to CORS policy.
 
-### Prasyarat
+### Prerequisites
 - Git
-- Python 3 **atau** Node.js
+- Python 3 **or** Node.js
 
-### 1. Clone Repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/nyomann-arch/EnvMoss.git
 cd EnvMoss
 ```
 
-### 2. Jalankan Local Server
+### 2. Start a Local Server
 
-**Opsi A — Menggunakan Python 3 (Direkomendasikan):**
+**Option A — Using Python 3 (Recommended):**
 ```bash
 python -m http.server 3000
 ```
 
-**Opsi B — Menggunakan npx serve (Jika Node.js terpasang):**
+**Option B — Using npx serve (If Node.js is installed):**
 ```bash
 npx serve .
 ```
-*(Catatan: `npx serve` hanya bertindak sebagai server berkas statis lokal sederhana, bukan dependensi aplikasi atau build step).*
+*(Note: `npx serve` only acts as a simple local static file server, not an application dependency or build step.)*
 
-### 3. Buka di Browser
-Akses alamat berikut pada peramban Anda:
+### 3. Open in Your Browser
+Visit the following address in your browser:
 ```text
 http://localhost:3000
 ```
 
-> **Catatan Pengembang:** Proyek ini adalah aplikasi web statis murni tanpa build step. Tidak memerlukan instalasi package manager atau build runner eksternal.
+> **Developer Note:** This project is a pure static web application with no build step. It does not require an external package manager or build runner.
 
 ---
 
-## Struktur Repository
+## Repository Structure
 
 ```text
 EnvMoss/
 ├── css/
-│   └── styles.css          # Design tokens, styling komponen, dan responsivitas
+│   ├── styles.css          # Design tokens, global .site- components, dark theme
+│   ├── tool.css            # Comparison Tool specific styles
+│   ├── landing.css         # Landing page styles
+│   └── guide.css           # Guide page styles
 ├── docs/
-│   ├── 01-agent-rules.md   # Panduan teknis arsitektur dan batasan proyek
-│   ├── 02-prd-envmoss.md   # Dokumen Kebutuhan Produk (PRD) EnvMoss
-│   └── 03-design-systems.md# Acuan design system visual dan tokens
+│   ├── 01-agent-rules.md   # Technical architecture and project constraint guide
+│   ├── 02-prd-envmoss.md   # EnvMoss Product Requirements Document (PRD)
+│   └── 03-design-systems.md# Visual design system and tokens reference
 ├── js/
-│   ├── app.js              # Interaksi antarmuka pengguna, input, dan rendering DOM
-│   ├── env-engine.js       # Core comparison engine dan parser (independen dari DOM)
-│   └── output-generator.js # Logika pembuat Markdown Checklist dan Merged .env
-├── index.html              # Antarmuka web utama
-├── LICENSE                 # Berkas lisensi open-source MIT
-└── README.md               # Dokumentasi resmi proyek
+│   ├── app.js              # Tool UI interactions, input handling, DOM rendering
+│   ├── env-engine.js       # Core comparison engine and parser (DOM-independent)
+│   ├── output-generator.js # Markdown Checklist and Merged .env generation
+│   ├── i18n.js             # Local EN/ID translation dictionary and DOM application
+│   └── site.js             # Global behavior: navbar, language, theme
+├── index.html              # Landing page
+├── app/
+│   └── index.html          # Comparison Tool
+├── guide/
+│   └── index.html          # Guide
+├── LICENSE                 # MIT open-source license file
+├── README.md               # English documentation
+└── README.id.md            # Bahasa Indonesia documentation
 ```
 
 ---
 
 ## Deployment
 
-EnvMoss dapat dideploy secara instan ke platform static web hosting mana pun tanpa pengaturan server khusus:
+EnvMoss can be deployed instantly to any static web hosting platform without special server configuration:
 
-- **Live Demo Vercel:** [https://envmoss.vercel.app/](https://envmoss.vercel.app/)
-- **GitHub Pages:** Cukup arahkan sumber publikasi ke branch `main` pada root direktori `/`.
-- **Netlify:** Hubungkan repositori dengan direktori publik root (`.`).
-
----
-
-## Kontribusi dan Feedback
-
-Kontribusi untuk perbaikan bug, penambahan skenario pengujian, dan penyempurnaan dokumentasi sangat diterima!
-
-1. Laporkan masalah atau diskusikan ide fitur baru melalui [GitHub Issues](https://github.com/nyomann-arch/EnvMoss/issues).
-2. Kirimkan perbaikan kode atau dokumentasi melalui [Pull Request](https://github.com/nyomann-arch/EnvMoss/pulls).
+- **Live Demo on Vercel:** [https://envmoss.vercel.app/](https://envmoss.vercel.app/)
+- **GitHub Pages:** Point the publish source to the `main` branch at the root `/` directory.
+- **Netlify:** Connect the repository with the root (`.`) public directory.
 
 ---
 
-## Lisensi
+## Contributing & Feedback
 
-Proyek ini dilisensikan di bawah lisensi terbuka [MIT License](LICENSE) © 2026 nyomann-arch.
+Contributions for bug fixes, additional test scenarios, and documentation improvements are very welcome!
+
+1. Report issues or discuss new feature ideas via [GitHub Issues](https://github.com/nyomann-arch/EnvMoss/issues).
+2. Submit code or documentation fixes via [Pull Request](https://github.com/nyomann-arch/EnvMoss/pulls).
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) © 2026 nyomann-arch.

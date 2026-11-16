@@ -26,8 +26,9 @@ function assert(condition, name) {
 }
 
 const appJs = fs.readFileSync('c:/envmoss/js/app.js', 'utf8');
-const stylesCss = fs.readFileSync('c:/envmoss/css/styles.css', 'utf8');
-const indexHtml = fs.readFileSync('c:/envmoss/index.html', 'utf8');
+// Sejak Milestone 7, style khusus Tool berada di css/tool.css
+const stylesCss = fs.readFileSync('c:/envmoss/css/tool.css', 'utf8');
+const indexHtml = fs.readFileSync('c:/envmoss/app/index.html', 'utf8');
 
 console.log('--- 1. Cek Komponen & Fungsi di app.js ---');
 assert(appJs.includes('function renderResults'), 'renderResults function defined');
@@ -41,7 +42,8 @@ assert(appJs.includes('btn-copy-checklist'), 'btn-copy-checklist button rendered
 assert(appJs.includes('btn-download-merged'), 'btn-download-merged button rendered');
 assert(appJs.includes('warnings-banner'), 'warnings-banner rendered conditionally');
 assert(appJs.includes('no-difference-banner'), 'no-difference-banner rendered conditionally');
-assert(appJs.includes('[nilai disembunyikan]'), '[nilai disembunyikan] masking placeholder used');
+// Milestone 8: teks masking kini berasal dari kamus i18n (tool.valueMask)
+assert(appJs.includes("t('tool.valueMask')"), 'value masking via kamus i18n (tool.valueMask)');
 
 console.log('\n--- 2. Cek Design Tokens & Styling di styles.css ---');
 assert(stylesCss.includes('.results-layout'), 'CSS .results-layout exists');

@@ -22,6 +22,7 @@ import {
   copyToClipboard,
   downloadFile
 } from './output-generator.js';
+import { t, getLang, onLanguageChange } from './i18n.js';
 
 // ---------------------------------------------------------------------------
 // State aplikasi — hanya di memori, tidak persisten
@@ -33,10 +34,10 @@ import {
  * @property {boolean}     hasFile   - true jika teks berasal dari file (bukan hanya ketikan).
  */
 
-/** @type {{ base: SlotState, target: SlotState, lastComparison: any|null }} */
+/** @type {{ base: SlotState & { dropzoneState?: string, dropzoneInfo?: string }, target: SlotState & { dropzoneState?: string, dropzoneInfo?: string }, lastComparison: any|null }} */
 const state = {
-  base: { fileName: null, hasFile: false },
-  target: { fileName: null, hasFile: false },
+  base: { fileName: null, hasFile: false, dropzoneState: 'empty', dropzoneInfo: undefined },
+  target: { fileName: null, hasFile: false, dropzoneState: 'empty', dropzoneInfo: undefined },
   lastComparison: null,
 };
 
@@ -88,7 +89,7 @@ function readFileAsText(file) {
 
     reader.onerror = () => {
       // Jangan sertakan detail file di pesan error
-      reject(new Error('File gagal dibaca. Pastikan file tidak terkunci atau rusak.'));
+      reject(new Error(t('tool.errReadFile')));
     };
 
     reader.readAsText(file, 'UTF-8');
@@ -152,7 +153,6 @@ function setSlotLoaded(slot, fileName) {
       clearBtn = document.createElement('button');
       clearBtn.type = 'button';
       clearBtn.className = 'input-card__clear-btn';
-      clearBtn.setAttribute('aria-label', `Hapus file ${slot === 'base' ? 'Base' : 'Target'}`);
       clearBtn.textContent = '×';
       clearBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -160,6 +160,11 @@ function setSlotLoaded(slot, fileName) {
       });
       fileTag.appendChild(clearBtn);
     }
+    // Label diperbarui setiap kali slot di-render agar mengikuti bahasa aktif
+    clearBtn.setAttribute(
+      'aria-label',
+      t('tool.clearFile', { slot: slot === 'base' ? 'Base' : 'Target' })
+    );
 
     card.classList.add('input-card--has-file');
     setDropzoneLoaded(dropzone, fileName);
@@ -245,6 +250,10 @@ function renderDropzoneContent(dropzone, stateType, info) {
   const slot   = isBase ? 'base' : 'target';
   const hintId = `dropzone-${slot}-hint`;
 
+  // Catat state visual dropzone agar dapat dirender ulang saat bahasa berganti
+  state[slot].dropzoneState = stateType;
+  state[slot].dropzoneInfo = info;
+
   // Simpan referensi ke file input dan tombol (tidak dihapus)
   const fileInput = dropzone.querySelector('input[type="file"]');
   const fileBtn   = dropzone.querySelector('.dropzone__file-btn');
@@ -262,7 +271,7 @@ function renderDropzoneContent(dropzone, stateType, info) {
     const text = document.createElement('p');
     text.className = 'dropzone__text';
     text.id = hintId;
-    text.innerHTML = '<strong>Seret file ke sini</strong><br />atau pilih dari perangkat';
+    text.innerHTML = t('tool.dropzoneEmpty');
 
     dropzone.insertBefore(text, fileInput);
     dropzone.insertBefore(icon, text);
@@ -272,7 +281,7 @@ function renderDropzoneContent(dropzone, stateType, info) {
     const text = document.createElement('p');
     text.className = 'dropzone__text dropzone__text--loaded';
     text.id = hintId;
-    text.innerHTML = '<strong>File berhasil dibaca</strong><br />Teks telah diisi ke textarea';
+    text.innerHTML = t('tool.dropzoneLoaded');
 
     dropzone.insertBefore(text, fileInput);
     dropzone.insertBefore(icon, text);
@@ -283,7 +292,7 @@ function renderDropzoneContent(dropzone, stateType, info) {
     text.className = 'dropzone__text dropzone__text--error';
     text.id = hintId;
     // info adalah pesan error yang sudah disanitasi (tidak mengandung isi file)
-    text.innerHTML = `<strong>Gagal membaca file</strong><br />${escapeHtml(info || 'Terjadi kesalahan.')}`;
+    text.innerHTML = `<strong>${escapeHtml(t('tool.dropzoneErrorTitle'))}</strong><br />${escapeHtml(info || t('tool.errGeneric'))}`;
 
     dropzone.insertBefore(text, fileInput);
     dropzone.insertBefore(icon, text);
@@ -391,7 +400,7 @@ async function processFile(file, slot, dropzone, textarea) {
     updateCompareButton();
   } catch (err) {
     // Pesan error yang aman — tidak mengandung isi file atau stack trace lengkap
-    setDropzoneError(dropzone, err.message || 'File tidak dapat dibaca.');
+    setDropzoneError(dropzone, err.message || t('tool.errFileUnreadable'));
     // Pastikan state slot tetap bersih
     state[slot].fileName = null;
     state[slot].hasFile  = false;
@@ -606,9 +615,9 @@ function attachOutputHooks(result) {
 
   if (copyBtn && !copyBtn.disabled) {
     copyBtn.addEventListener('click', async () => {
-      const markdown = generateMarkdownChecklist(result.missing);
+      const markdown = generateMarkdownChecklist(result.missing, getLang());
       if (!markdown) {
-        showSidebarFeedback('Tidak ada key Missing untuk dibuatkan checklist.', 'info');
+        showSidebarFeedback(t('tool.fbNoMissing'), 'info');
         return;
       }
 
@@ -619,17 +628,17 @@ function attachOutputHooks(result) {
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
             <path d="M4 9.5L7.5 13L14 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          Tersalin ke Clipboard!
+          ${escapeHtml(t('tool.copied'))}
         `;
         copyBtn.disabled = true;
-        showSidebarFeedback('Checklist Markdown berhasil disalin ke clipboard.', 'success');
+        showSidebarFeedback(t('tool.fbCopied'), 'success');
 
         setTimeout(() => {
           copyBtn.innerHTML = originalHtml;
           copyBtn.disabled = false;
         }, 2000);
       } catch (err) {
-        showSidebarFeedback(err.message || 'Gagal menyalin ke clipboard.', 'error');
+        showSidebarFeedback(err.message || t('tool.errCopy'), 'error');
       }
     });
   }
@@ -638,16 +647,16 @@ function attachOutputHooks(result) {
     downloadBtn.addEventListener('click', () => {
       try {
         const targetText = textareaTarget.value;
-        const mergedContent = generateMergedEnv(targetText, result.missing);
+        const mergedContent = generateMergedEnv(targetText, result.missing, getLang());
         downloadFile(mergedContent, 'envmoss-merged.env');
 
         if (result.missing && result.missing.length > 0) {
-          showSidebarFeedback('File envmoss-merged.env diunduh. Harap lengkapi nilai variabel kosong sebelum digunakan.', 'info');
+          showSidebarFeedback(t('tool.fbDownloadedFill'), 'info');
         } else {
-          showSidebarFeedback('File envmoss-merged.env diunduh (identik dengan Target asli).', 'success');
+          showSidebarFeedback(t('tool.fbDownloadedSame'), 'success');
         }
       } catch (err) {
-        showSidebarFeedback(err.message || 'Gagal membuat file unduhan.', 'error');
+        showSidebarFeedback(err.message || t('tool.errDownload'), 'error');
       }
     });
   }
@@ -665,8 +674,9 @@ function attachOutputHooks(result) {
  *   - Nilai selalu ditampilkan dengan placeholder masking '[nilai disembunyikan]'.
  *
  * @param {any} result - Objek hasil dari compareEnvFiles()
+ * @param {boolean} [shouldScroll=true] - Gulir ke hasil; nonaktif saat render ulang bahasa
  */
-function renderResults(result) {
+function renderResults(result, shouldScroll = true) {
   if (!result || !resultsSection || !emptyState) return;
 
   // Sembunyikan empty state dan aktifkan results-section
@@ -685,24 +695,21 @@ function renderResults(result) {
     ];
 
     html += `
-      <aside class="warnings-banner" role="alert" aria-label="Peringatan penguraian file">
+      <aside class="warnings-banner" role="alert" aria-label="${escapeHtml(t('tool.warnAria'))}">
         <div class="warnings-banner__header">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
             <path d="M10 2L1 18H19L10 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
             <path d="M10 8V12M10 15H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          <h3 class="warnings-banner__title">Parsing Warning (${allWarnings.length} baris tidak dapat dianalisis)</h3>
+          <h3 class="warnings-banner__title">${escapeHtml(t('tool.warnTitle', { count: allWarnings.length }))}</h3>
         </div>
-        <p class="warnings-banner__desc">
-          Baris berikut tidak sesuai format yang didukung sehingga tidak dimasukkan ke dalam hasil komparasi.
-          Hasil pemeriksaan di bawah mungkin belum mencakup konfigurasi dari baris-baris ini.
-        </p>
+        <p class="warnings-banner__desc">${escapeHtml(t('tool.warnDesc'))}</p>
         <ul class="warnings-banner__list">
           ${allWarnings.map(w => `
             <li class="warnings-banner__item">
               <span class="warnings-banner__tag">${escapeHtml(w.side)}</span>
-              <span>Baris ${w.line}:</span>
-              <span>${escapeHtml(w.reason)}</span>
+              <span>${escapeHtml(t('tool.warnLine', { line: w.line }))}</span>
+              <span>${escapeHtml(warningReason(w))}</span>
             </li>
           `).join('')}
         </ul>
@@ -718,17 +725,14 @@ function renderResults(result) {
 
   if (isPerfectMatch) {
     html += `
-      <div class="no-difference-banner" role="status" aria-label="Struktur cocok sempurna">
+      <div class="no-difference-banner" role="status" aria-label="${escapeHtml(t('tool.perfectAria'))}">
         <svg class="no-difference-banner__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
           <path d="M8 12.5L10.5 15L16 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <div>
-          <h3 class="no-difference-banner__title">Struktur Key Cocok Sempurna</h3>
-          <p class="no-difference-banner__desc">
-            Tidak ditemukan key yang Missing, Orphan, Duplicate, atau Mismatch antara Base dan Target.
-            <br /><small>(Catatan: Ini menunjukkan kesesuaian struktur konfigurasi, bukan kebenaran value runtime aplikasi Anda).</small>
-          </p>
+          <h3 class="no-difference-banner__title">${escapeHtml(t('tool.perfectTitle'))}</h3>
+          <p class="no-difference-banner__desc">${t('tool.perfectDesc')}</p>
         </div>
       </div>
     `;
@@ -745,9 +749,9 @@ function renderResults(result) {
               <rect x="2" y="3" width="7" height="14" rx="2" stroke="currentColor" stroke-width="1.75"/>
               <rect x="11" y="3" width="7" height="14" rx="2" stroke="currentColor" stroke-width="1.75"/>
             </svg>
-            Papan Komparasi Lingkungan
+            ${t('tool.boardTitle')}
           </div>
-          <span class="diff-board-card__subtitle">Nilai variabel disembunyikan</span>
+          <span class="diff-board-card__subtitle">${escapeHtml(t('tool.boardSubtitle'))}</span>
         </div>
 
         <div class="diff-board-grid">
@@ -755,7 +759,7 @@ function renderResults(result) {
           <div class="diff-column diff-column--base">
             <div class="diff-column__header">
               <span>Base Environment</span>
-              <span class="diff-column__count">${summary.totalUniqueBaseKeys} key</span>
+              <span class="diff-column__count">${escapeHtml(t('tool.keysCount', { count: summary.totalUniqueBaseKeys }))}</span>
             </div>
             <ul class="diff-column__list" id="diff-list-base">
   `;
@@ -787,29 +791,29 @@ function renderResults(result) {
     if (baseItem) {
       const rowClass = `diff-row diff-row--${baseItem.status.toLowerCase()}`;
       const badgeClass = `badge badge--${baseItem.status.toLowerCase()}`;
-      const statusLabel = baseItem.status === 'Mismatch' ? 'Value berbeda' : baseItem.status;
+      const statusLabel = baseItem.status === 'Mismatch' ? t('tool.statusMismatchLabel') : baseItem.status;
       const dupPill = baseItem.isDuplicate
-        ? `<span class="badge badge--duplicate" title="Muncul ${baseItem.duplicateCount} kali (baris ${baseItem.lines.join(', ')})">Duplikat (${baseItem.duplicateCount}×)</span>`
+        ? `<span class="badge badge--duplicate" title="${escapeHtml(t('tool.dupTitle', { count: baseItem.duplicateCount, lines: baseItem.lines.join(', ') }))}">${escapeHtml(t('tool.dupBadge', { count: baseItem.duplicateCount }))}</span>`
         : '';
 
       baseRowsHtml += `
         <li class="${rowClass}">
           <div class="diff-row__left">
-            <span class="diff-row__line" title="Baris ${baseItem.line}">L${baseItem.line}</span>
+            <span class="diff-row__line" title="${escapeHtml(t('tool.lineLabel', { line: baseItem.line }))}">L${baseItem.line}</span>
             <span class="diff-row__key">${escapeHtml(key)}</span>
-            <span class="diff-row__value-mask">= [nilai disembunyikan]</span>
+            <span class="diff-row__value-mask">${escapeHtml(t('tool.valueMask'))}</span>
           </div>
           <div class="diff-row__badges">
             ${dupPill}
-            <span class="${badgeClass}">${statusLabel}</span>
+            <span class="${badgeClass}">${escapeHtml(statusLabel)}</span>
           </div>
         </li>
       `;
     } else {
       // Slot kosong di Base karena key ini Orphan di Target
       baseRowsHtml += `
-        <li class="diff-row diff-row--empty" aria-label="Tidak ada di Base">
-          <span>— Tidak terdaftar di Base —</span>
+        <li class="diff-row diff-row--empty" aria-label="${escapeHtml(t('tool.rowEmptyBaseAria'))}">
+          <span>${escapeHtml(t('tool.rowEmptyBaseText'))}</span>
         </li>
       `;
     }
@@ -818,29 +822,29 @@ function renderResults(result) {
     if (targetItem) {
       const rowClass = `diff-row diff-row--${targetItem.status.toLowerCase()}`;
       const badgeClass = `badge badge--${targetItem.status.toLowerCase()}`;
-      const statusLabel = targetItem.status === 'Mismatch' ? 'Value berbeda' : targetItem.status;
+      const statusLabel = targetItem.status === 'Mismatch' ? t('tool.statusMismatchLabel') : targetItem.status;
       const dupPill = targetItem.isDuplicate
-        ? `<span class="badge badge--duplicate" title="Muncul ${targetItem.duplicateCount} kali (baris ${targetItem.lines.join(', ')})">Duplikat (${targetItem.duplicateCount}×)</span>`
+        ? `<span class="badge badge--duplicate" title="${escapeHtml(t('tool.dupTitle', { count: targetItem.duplicateCount, lines: targetItem.lines.join(', ') }))}">${escapeHtml(t('tool.dupBadge', { count: targetItem.duplicateCount }))}</span>`
         : '';
 
       targetRowsHtml += `
         <li class="${rowClass}">
           <div class="diff-row__left">
-            <span class="diff-row__line" title="Baris ${targetItem.line}">L${targetItem.line}</span>
+            <span class="diff-row__line" title="${escapeHtml(t('tool.lineLabel', { line: targetItem.line }))}">L${targetItem.line}</span>
             <span class="diff-row__key">${escapeHtml(key)}</span>
-            <span class="diff-row__value-mask">= [nilai disembunyikan]</span>
+            <span class="diff-row__value-mask">${escapeHtml(t('tool.valueMask'))}</span>
           </div>
           <div class="diff-row__badges">
             ${dupPill}
-            <span class="${badgeClass}">${statusLabel}</span>
+            <span class="${badgeClass}">${escapeHtml(statusLabel)}</span>
           </div>
         </li>
       `;
     } else {
       // Slot kosong di Target karena key ini Missing
       targetRowsHtml += `
-        <li class="diff-row diff-row--empty" aria-label="Tidak ada di Target">
-          <span>— Tidak ditemukan di Target —</span>
+        <li class="diff-row diff-row--empty" aria-label="${escapeHtml(t('tool.rowEmptyTargetAria'))}">
+          <span>${escapeHtml(t('tool.rowEmptyTargetText'))}</span>
         </li>
       `;
     }
@@ -855,7 +859,7 @@ function renderResults(result) {
           <div class="diff-column diff-column--target">
             <div class="diff-column__header">
               <span>Target Environment</span>
-              <span class="diff-column__count">${summary.totalUniqueTargetKeys} key</span>
+              <span class="diff-column__count">${escapeHtml(t('tool.keysCount', { count: summary.totalUniqueTargetKeys }))}</span>
             </div>
             <ul class="diff-column__list" id="diff-list-target">
               ${targetRowsHtml}
@@ -865,37 +869,37 @@ function renderResults(result) {
       </div>
 
       <!-- Sidebar Ringkasan & Aksi -->
-      <aside class="results-sidebar" aria-label="Ringkasan status dan aksi hasil">
+      <aside class="results-sidebar" aria-label="${escapeHtml(t('tool.sidebarAria'))}">
         <div class="summary-card">
-          <h3 class="summary-card__title">Ringkasan Status</h3>
+          <h3 class="summary-card__title">${escapeHtml(t('tool.summaryTitle'))}</h3>
 
           <div class="summary-stat-grid">
             <!-- Missing -->
             <div class="summary-stat-box summary-stat-box--missing">
               <span class="summary-stat-box__num">${summary.missingCount}</span>
               <span class="summary-stat-box__label">Missing</span>
-              <span class="summary-stat-box__desc">Key belum ada di Target</span>
+              <span class="summary-stat-box__desc">${escapeHtml(t('tool.statMissingDesc'))}</span>
             </div>
 
             <!-- Orphan -->
             <div class="summary-stat-box summary-stat-box--orphan">
               <span class="summary-stat-box__num">${summary.orphanCount}</span>
               <span class="summary-stat-box__label">Orphan / Extra</span>
-              <span class="summary-stat-box__desc">Key tambahan di Target</span>
+              <span class="summary-stat-box__desc">${escapeHtml(t('tool.statOrphanDesc'))}</span>
             </div>
 
             <!-- Duplicate -->
             <div class="summary-stat-box summary-stat-box--duplicate">
               <span class="summary-stat-box__num">${summary.duplicateGroupCount}</span>
               <span class="summary-stat-box__label">Duplicate</span>
-              <span class="summary-stat-box__desc">Kelompok key berulang</span>
+              <span class="summary-stat-box__desc">${escapeHtml(t('tool.statDuplicateDesc'))}</span>
             </div>
 
             <!-- Mismatch -->
             <div class="summary-stat-box summary-stat-box--mismatch">
               <span class="summary-stat-box__num">${summary.mismatchCount}</span>
               <span class="summary-stat-box__label">Mismatch</span>
-              <span class="summary-stat-box__desc">Key sama, nilai berbeda</span>
+              <span class="summary-stat-box__desc">${escapeHtml(t('tool.statMismatchDesc'))}</span>
             </div>
           </div>
 
@@ -905,27 +909,27 @@ function renderResults(result) {
               class="btn btn--primary"
               id="btn-copy-checklist"
               ${summary.missingCount === 0 ? 'disabled aria-disabled="true"' : ''}
-              title="${summary.missingCount === 0 ? 'Tidak ada key Missing untuk dibuatkan checklist' : 'Salin daftar tugas key Missing dalam format Markdown'}"
+              title="${escapeHtml(summary.missingCount === 0 ? t('tool.copyTitleDisabled') : t('tool.copyTitleEnabled'))}"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                 <rect x="5" y="5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
                 <path d="M3 13V3.5C3 3.22386 3.22386 3 3.5 3H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-              Salin Markdown Checklist
+              ${escapeHtml(t('tool.copyBtn'))}
             </button>
 
             <button
               type="button"
               class="btn btn--secondary"
               id="btn-download-merged"
-              title="Unduh salinan Target yang telah dilengkapi key Missing dengan nilai kosong"
+              title="${escapeHtml(t('tool.downloadTitle'))}"
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                 <path d="M3 13v2a1.5 1.5 0 001.5 1.5h9a1.5 1.5 0 001.5-1.5v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <polyline points="5.5,8.5 9,12 12.5,8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <line x1="9" y1="2" x2="9" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-              Unduh Merged .env
+              ${escapeHtml(t('tool.downloadBtn'))}
             </button>
           </div>
 
@@ -936,7 +940,7 @@ function renderResults(result) {
               <path d="M8 1.5L2 4V8C2 11.314 4.686 14.314 8 15C11.314 14.314 14 11.314 14 8V4L8 1.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
               <path d="M5.5 8L7 9.5L10.5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>100% Client-Side. Pemrosesan dilakukan di memori browser — tidak ada data dikirim ke server.</span>
+            <span>${escapeHtml(t('tool.privacyNote'))}</span>
           </div>
         </div>
       </aside>
@@ -948,8 +952,54 @@ function renderResults(result) {
   // Pasang hook output
   attachOutputHooks(result);
 
-  // Gulir halus ke hasil agar pengguna segera melihat tabel komparasi
-  resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Gulir halus ke hasil agar pengguna segera melihat tabel komparasi.
+  // Dilewati saat render ulang akibat pergantian bahasa.
+  if (shouldScroll) {
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/**
+ * Menerjemahkan alasan parsing warning mengikuti bahasa aktif.
+ * Engine menyediakan reasonKey ke kamus i18n; reason tetap menjadi fallback.
+ *
+ * @param {{ reason?: string, reasonKey?: string }} w
+ * @returns {string}
+ */
+function warningReason(w) {
+  if (w && w.reasonKey) {
+    const translated = t(w.reasonKey);
+    if (translated !== w.reasonKey) {
+      return translated;
+    }
+  }
+  return (w && w.reason) || '';
+}
+
+/**
+ * Render ulang seluruh UI dinamis Tool mengikuti bahasa aktif:
+ * konten dropzone, file-tag, dan hasil komparasi terakhir (jika ada).
+ */
+function refreshLocalizedUi() {
+  ['base', 'target'].forEach((slot) => {
+    const dropzone = slot === 'base' ? dropzoneBase : dropzoneTarget;
+    const slotState = state[slot];
+    if (slotState.dropzoneState === 'loaded') {
+      setDropzoneLoaded(dropzone, slotState.fileName);
+    } else if (slotState.dropzoneState === 'error') {
+      setDropzoneError(dropzone, slotState.dropzoneInfo);
+    } else {
+      setDropzoneEmpty(dropzone);
+    }
+    // Perbarui label aria tombol hapus file bila file masih terpasang
+    if (slotState.hasFile && slotState.fileName) {
+      setSlotLoaded(slot, slotState.fileName);
+    }
+  });
+
+  if (state.lastComparison) {
+    renderResults(state.lastComparison, false);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1011,6 +1061,9 @@ function init() {
   // Tombol aksi
   bindClearAll();
   bindCompare();
+
+  // Render ulang konten dinamis setiap bahasa antarmuka berganti
+  onLanguageChange(refreshLocalizedUi);
 
   // Pastikan tombol Bandingkan dalam kondisi yang benar saat halaman dimuat
   updateCompareButton();

@@ -202,11 +202,14 @@ body {
 /* --------------------------------------------------------------------------
    4. Pencegahan kilatan teks bahasa (language flash)
    Selama bootstrap i18n belum menerapkan kamus, teks bertanda data-i18n
-   ditahan tanpa menghilangkan ruang layout. Milestone 8 akan mengisi
-   atribut data-i18n dan melepas penanda ini.
+   ditahan tanpa menghilangkan ruang layout. Modul js/i18n.js mengisi
+   atribut tersebut lalu melepas penanda ini; failsafe inline di akhir
+   <body> menjamin penanda tetap dilepas jika modul gagal dimuat.
    -------------------------------------------------------------------------- */
 
-html[data-i18n-pending="true"] [data-i18n] {
+html[data-i18n-pending="true"] [data-i18n],
+html[data-i18n-pending="true"] [data-i18n-html],
+html[data-i18n-pending="true"] [data-i18n-attr] {
   visibility: hidden;
 }
 

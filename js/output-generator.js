@@ -10,7 +10,15 @@
  *   - Tidak ada pengiriman data ke server mana pun.
  *   - Nilai variabel rahasia tidak pernah diekspos di Markdown checklist.
  *   - Teks Target asli tidak diubah satu karakter pun pada Merged .env.
+ *
+ * Internasionalisasi (Milestone 8):
+ *   - generateMarkdownChecklist dan generateMergedEnv menerima parameter
+ *     opsional `lang` ('en'|'id') untuk mengikuti bahasa antarmuka aktif.
+ *     Tanpa argumen, output tetap memakai format Bahasa Indonesia v1.0.0.
+ *   - Nama file, nama key, dan nilai tidak pernah diterjemahkan.
  */
+
+import { t } from './i18n.js';
 
 // ---------------------------------------------------------------------------
 // 1. Helper Deteksi Line Ending
@@ -45,9 +53,10 @@ export function detectLineEnding(text) {
  * - [ ] Tambahkan `CACHE_DRIVER` ke Target Environment
  *
  * @param {Array<string|{ key: string }>} missingKeys - Daftar key Missing (urutan Base)
+ * @param {'en'|'id'} [lang] - Bahasa output; default mengikuti format ID v1.0.0
  * @returns {string} - Teks Markdown checklist, atau string kosong jika tidak ada missing.
  */
-export function generateMarkdownChecklist(missingKeys) {
+export function generateMarkdownChecklist(missingKeys, lang) {
   if (!Array.isArray(missingKeys) || missingKeys.length === 0) {
     return '';
   }
@@ -55,10 +64,16 @@ export function generateMarkdownChecklist(missingKeys) {
   // Ekstrak nama key unik
   const keys = missingKeys.map((item) => (typeof item === 'string' ? item : item.key));
 
+  const isEn = lang === 'en';
+  const title = isEn ? '## Environment Checklist' : '## Checklist Environment';
+  const itemTemplate = isEn
+    ? (key) => `- [ ] Add \`${key}\` to Target Environment`
+    : (key) => `- [ ] Tambahkan \`${key}\` ke Target Environment`;
+
   const lines = [
-    '## Checklist Environment',
+    title,
     '',
-    ...keys.map((key) => `- [ ] Tambahkan \`${key}\` ke Target Environment`)
+    ...keys.map(itemTemplate)
   ];
 
   return lines.join('\n');
@@ -76,9 +91,10 @@ export function generateMarkdownChecklist(missingKeys) {
  *
  * @param {string} targetText - Teks asli Target Environment
  * @param {Array<string|{ key: string }>} missingKeys - Daftar key Missing (urutan Base)
+ * @param {'en'|'id'} [lang] - Bahasa komentar penanda; default format ID v1.0.0
  * @returns {string}
  */
-export function generateMergedEnv(targetText, missingKeys) {
+export function generateMergedEnv(targetText, missingKeys, lang) {
   const rawTarget = typeof targetText === 'string' ? targetText : '';
 
   const keys = Array.isArray(missingKeys)
@@ -106,7 +122,9 @@ export function generateMergedEnv(targetText, missingKeys) {
     }
   }
 
-  const marker = '# Ditambahkan oleh EnvMoss: key yang Missing';
+  const marker = lang === 'en'
+    ? '# Added by EnvMoss: Missing keys'
+    : '# Ditambahkan oleh EnvMoss: key yang Missing';
   const missingLines = keys.map((key) => `${key}=`).join(le);
 
   return prefix + separator + marker + le + missingLines;
@@ -124,7 +142,7 @@ export function generateMergedEnv(targetText, missingKeys) {
  */
 export async function copyToClipboard(text) {
   if (!text) {
-    throw new Error('Tidak ada teks untuk disalin.');
+    throw new Error(t('out.errNoText'));
   }
 
   if (navigator?.clipboard?.writeText) {
@@ -145,13 +163,13 @@ export async function copyToClipboard(text) {
   try {
     const successful = document.execCommand('copy');
     document.body.removeChild(textArea);
-    if (!successful) throw new Error('Salin manual via execCommand gagal.');
+    if (!successful) throw new Error(t('out.errExecCopy'));
     return true;
   } catch (err) {
     if (textArea.parentNode) {
       document.body.removeChild(textArea);
     }
-    throw new Error('Clipboard API tidak didukung atau izin ditolak browser.');
+    throw new Error(t('out.errClipboard'));
   }
 }
 

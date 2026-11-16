@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,25 +56,25 @@
   </script>
 
   <!-- Primary Meta Tags -->
-  <title>Panduan — EnvMoss</title>
-  <meta name="title" content="Panduan — EnvMoss" />
-  <meta name="description" content="Panduan penggunaan EnvMoss: cara memasukkan file .env, menjalankan komparasi, memahami status hasil, dan menggunakan output Markdown Checklist serta Merged .env." />
+  <title data-i18n="guide.title">Guide — EnvMoss</title>
+  <meta name="title" content="Guide — EnvMoss" />
+  <meta name="description" content="EnvMoss usage guide: how to enter .env files, run a comparison, understand result statuses, and use the Markdown Checklist and Merged .env outputs." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://envmoss.vercel.app/guide/" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://envmoss.vercel.app/guide/" />
-  <meta property="og:title" content="Panduan — EnvMoss" />
-  <meta property="og:description" content="Panduan penggunaan EnvMoss: komparasi file environment secara lokal di browser." />
+  <meta property="og:title" content="Guide — EnvMoss" />
+  <meta property="og:description" content="EnvMoss usage guide: compare environment files locally in the browser." />
   <meta property="og:image" content="https://envmoss.vercel.app/assets/og-image.png" />
   <meta property="og:site_name" content="EnvMoss" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://envmoss.vercel.app/guide/" />
-  <meta name="twitter:title" content="Panduan — EnvMoss" />
-  <meta name="twitter:description" content="Panduan penggunaan EnvMoss: komparasi file environment secara lokal di browser." />
+  <meta name="twitter:title" content="Guide — EnvMoss" />
+  <meta name="twitter:description" content="EnvMoss usage guide: compare environment files locally in the browser." />
   <meta name="twitter:image" content="https://envmoss.vercel.app/assets/og-image.png" />
 
   <!-- Stylesheet: fondasi global lalu stylesheet khusus Guide -->
@@ -87,11 +87,11 @@
        Navbar global (fixed)
   ============================== -->
   <header class="site-header">
-    <nav class="site-navbar" aria-label="Navigasi utama">
+    <nav class="site-navbar" data-i18n-attr="aria-label:nav.aria">
       <div class="site-navbar__inner">
 
         <!-- Brand: mark + wordmark — satu-satunya tautan ke Landing -->
-        <a href="../" class="site-brand" aria-label="EnvMoss — ke halaman utama">
+        <a href="../" class="site-brand" data-i18n-attr="aria-label:nav.brandAria">
           <span class="site-brand__mark" aria-hidden="true">
             <!-- Ikon daun lumut — SVG lokal inline -->
             <svg
@@ -160,7 +160,7 @@
             </li>
           </ul>
 
-          <div class="site-lang" role="group" aria-label="Pilih bahasa antarmuka">
+          <div class="site-lang" role="group" data-i18n-attr="aria-label:nav.langAria">
             <button
               type="button"
               class="site-lang__btn"
@@ -180,7 +180,7 @@
             class="site-theme"
             id="site-theme-toggle"
             data-state="system"
-            aria-label="Ubah tema tampilan"
+            data-i18n-attr="aria-label:nav.themeAria"
           >
             <!-- Ikon terang (matahari) -->
             <svg
@@ -226,7 +226,7 @@
           </button>
 
           <!-- Indikator privasi ringkas -->
-          <span class="site-navbar__indicator" aria-label="Semua pemrosesan dilakukan di browser Anda">
+          <span class="site-navbar__indicator" data-i18n-attr="aria-label:nav.privacyAria">
             100% Client-Side
           </span>
 
@@ -237,33 +237,32 @@
   </header>
 
   <!-- ==============================
-       Main Content — Guide (kerangka awal Milestone 7)
+       Main Content — Guide
   ============================== -->
   <main class="site-main guide-article">
 
     <header class="guide-article__header">
-      <h1 class="guide-article__title">Panduan EnvMoss</h1>
-      <p class="guide-article__lead">
-        Cara menggunakan EnvMoss untuk membandingkan dua file environment
-        secara lokal di browser.
+      <h1 class="guide-article__title" data-i18n="guide.h1">EnvMoss Guide</h1>
+      <p class="guide-article__lead" data-i18n="guide.lead">
+        How to use EnvMoss to compare two environment files locally in your browser.
       </p>
     </header>
 
     <section class="guide-section" aria-labelledby="guide-start">
-      <h2 class="guide-section__title" id="guide-start">Mulai di sini</h2>
+      <h2 class="guide-section__title" id="guide-start" data-i18n="guide.startTitle">Getting started</h2>
       <ol class="guide-steps">
-        <li>Buka <a href="../app/">Comparison Tool</a>.</li>
-        <li>Masukkan <strong>Base Environment</strong> (biasanya <code>.env.example</code>) dan <strong>Target Environment</strong> (file yang ingin diperiksa) melalui drag-and-drop, pemilih file, atau copy-paste ke textarea.</li>
-        <li>Tekan <strong>Bandingkan</strong> untuk melihat Missing, Orphan, Duplicate, dan Mismatch.</li>
-        <li>Gunakan <strong>Salin Markdown Checklist</strong> atau <strong>Unduh Merged .env</strong> untuk menindaklanjuti hasil.</li>
+        <li data-i18n-html="guide.step1">Open the <a href="../app/">Comparison Tool</a>.</li>
+        <li data-i18n-html="guide.step2">Enter the <strong>Base Environment</strong> (usually <code>.env.example</code>) and the <strong>Target Environment</strong> (the file you want to inspect) via drag-and-drop, the file picker, or copy-paste into the textarea.</li>
+        <li data-i18n-html="guide.step3">Press <strong>Compare</strong> to see Missing, Orphan, Duplicate, and Mismatch.</li>
+        <li data-i18n-html="guide.step4">Use <strong>Copy Markdown Checklist</strong> or <strong>Download Merged .env</strong> to follow up on the results.</li>
       </ol>
     </section>
 
     <section class="guide-section" aria-labelledby="guide-privacy">
-      <h2 class="guide-section__title" id="guide-privacy">Privasi</h2>
-      <p class="guide-section__text">
-        Isi file <code>.env</code> Anda tetap berada di browser. EnvMoss tidak
-        mengunggahnya ke server dan tidak menyimpannya secara permanen.
+      <h2 class="guide-section__title" id="guide-privacy" data-i18n="guide.privacyTitle">Privacy</h2>
+      <p class="guide-section__text" data-i18n-html="guide.privacyText">
+        The contents of your <code>.env</code> files stay in your browser. EnvMoss does not
+        upload them to a server and does not store them permanently.
       </p>
     </section>
 
@@ -280,6 +279,14 @@
 
   <!-- JS modul perilaku global: navbar aktif, bahasa, tema -->
   <script type="module" src="../js/site.js"></script>
+
+  <!-- Failsafe i18n: jika modul kamus gagal dimuat, lepaskan penanda pending
+       agar konten fallback English tetap terlihat dan tidak tersembunyi. -->
+  <script>
+    setTimeout(function () {
+      document.documentElement.removeAttribute('data-i18n-pending');
+    }, 3000);
+  </script>
 
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -59,7 +59,7 @@
   <meta name="google-site-verification" content="UlgjpIQyIHUCMEOR-_iUBL0-BURcA9qFoJw3GOUBwCI" />
 
   <!-- Primary Meta Tags -->
-  <title>EnvMoss — Privacy-First Local .env File Comparison &amp; Merge Tool (Zero-Backend)</title>
+  <title data-i18n="tool.title">EnvMoss — Privacy-First Local .env File Comparison &amp; Merge Tool (Zero-Backend)</title>
   <meta name="title" content="EnvMoss — Privacy-First Local .env File Comparison &amp; Merge Tool (Zero-Backend)" />
   <meta name="description" content="Privacy-first, zero-backend developer utility for local .env file comparison and merge env operations. Compare, validate, and merge environment files securely in your browser without uploading secrets." />
   <meta name="keywords" content="privacy-first, local .env file comparison, merge env, zero-backend, environment variables diff, dotenv comparator, secret security, env validator, developer tools" />
@@ -93,11 +93,11 @@
        Navbar global (fixed)
   ============================== -->
   <header class="site-header">
-    <nav class="site-navbar" aria-label="Navigasi utama">
+    <nav class="site-navbar" data-i18n-attr="aria-label:nav.aria">
       <div class="site-navbar__inner">
 
         <!-- Brand: mark + wordmark — satu-satunya tautan ke Landing -->
-        <a href="../" class="site-brand" aria-label="EnvMoss — ke halaman utama">
+        <a href="../" class="site-brand" data-i18n-attr="aria-label:nav.brandAria">
           <span class="site-brand__mark" aria-hidden="true">
             <!-- Ikon daun lumut — SVG lokal inline -->
             <svg
@@ -166,7 +166,7 @@
             </li>
           </ul>
 
-          <div class="site-lang" role="group" aria-label="Pilih bahasa antarmuka">
+          <div class="site-lang" role="group" data-i18n-attr="aria-label:nav.langAria">
             <button
               type="button"
               class="site-lang__btn"
@@ -186,7 +186,7 @@
             class="site-theme"
             id="site-theme-toggle"
             data-state="system"
-            aria-label="Ubah tema tampilan"
+            data-i18n-attr="aria-label:nav.themeAria"
           >
             <!-- Ikon terang (matahari) -->
             <svg
@@ -232,7 +232,7 @@
           </button>
 
           <!-- Indikator privasi ringkas -->
-          <span class="site-navbar__indicator" aria-label="Semua pemrosesan dilakukan di browser Anda">
+          <span class="site-navbar__indicator" data-i18n-attr="aria-label:nav.privacyAria">
             100% Client-Side
           </span>
 
@@ -248,7 +248,7 @@
   <main class="site-main" id="main-content">
 
     <!-- Privacy Notice -->
-    <aside class="tool-privacy" role="note" aria-label="Informasi privasi">
+    <aside class="tool-privacy" role="note" data-i18n-attr="aria-label:tool.privacyAria">
       <svg
         class="tool-privacy__icon"
         width="16"
@@ -273,16 +273,16 @@
           stroke-linejoin="round"
         />
       </svg>
-      <span>
-        File <code>.env</code> Anda tetap berada di browser.
-        EnvMoss tidak mengunggahnya ke server.
+      <span data-i18n-html="tool.privacyText">
+        Your <code>.env</code> file stays in your browser.
+        EnvMoss does not upload it to a server.
       </span>
     </aside>
 
     <!-- ==============================
          Input Section
     ============================== -->
-    <section class="input-section" aria-label="Masukkan file environment">
+    <section class="input-section" data-i18n-attr="aria-label:tool.inputSection">
 
       <div class="input-section__grid">
 
@@ -294,7 +294,7 @@
                 <span class="input-card__title-dot" aria-hidden="true"></span>
                 Base Environment
               </h2>
-              <span class="input-card__hint">contoh: .env.example</span>
+              <span class="input-card__hint" data-i18n="tool.hintBase">e.g.: .env.example</span>
             </div>
           </div>
 
@@ -306,7 +306,7 @@
               id="dropzone-base"
               role="button"
               tabindex="0"
-              aria-label="Area drop file Base Environment. Tekan Enter atau Spasi untuk membuka pemilih file."
+              data-i18n-attr="aria-label:tool.dropzoneBaseAria"
               aria-describedby="dropzone-base-hint"
             >
               <!-- Ikon upload -->
@@ -345,9 +345,9 @@
                 />
               </svg>
 
-              <p class="dropzone__text" id="dropzone-base-hint">
-                <strong>Seret file ke sini</strong><br />
-                atau pilih dari perangkat
+              <p class="dropzone__text" id="dropzone-base-hint" data-i18n-html="tool.dropzoneEmpty">
+                <strong>Drag file here</strong><br />
+                or choose from your device
               </p>
 
               <!-- File picker tersembunyi, dikontrol tombol di bawah -->
@@ -356,7 +356,7 @@
                 id="file-input-base"
                 class="visually-hidden"
                 accept="*"
-                aria-label="Pilih file Base Environment"
+                data-i18n-attr="aria-label:tool.fileInputBase"
               />
 
               <button
@@ -364,26 +364,27 @@
                 class="dropzone__file-btn"
                 id="file-btn-base"
                 aria-controls="file-input-base"
+                data-i18n="tool.pickFile"
               >
-                Pilih File
+                Choose File
               </button>
             </div>
 
             <!-- Label textarea Base -->
-            <label for="textarea-base" class="textarea-label">
-              Atau tempel isi file di sini:
+            <label for="textarea-base" class="textarea-label" data-i18n="tool.pasteLabel">
+              Or paste the file contents here:
             </label>
 
             <!-- Textarea Base -->
             <textarea
               id="textarea-base"
               class="env-textarea"
-              placeholder="# Tempel isi .env.example di sini&#10;APP_NAME=&#10;API_KEY=&#10;DATABASE_URL="
+              data-i18n-attr="placeholder:tool.placeholderBase;aria-label:tool.textareaBase"
+              placeholder="# Paste the contents of .env.example here&#10;APP_NAME=&#10;API_KEY=&#10;DATABASE_URL="
               spellcheck="false"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
-              aria-label="Konten Base Environment"
             ></textarea>
 
           </div>
@@ -398,7 +399,7 @@
                 <span class="input-card__title-dot" aria-hidden="true"></span>
                 Target Environment
               </h2>
-              <span class="input-card__hint">contoh: .env, .env.production</span>
+              <span class="input-card__hint" data-i18n="tool.hintTarget">e.g.: .env, .env.production</span>
             </div>
           </div>
 
@@ -410,7 +411,7 @@
               id="dropzone-target"
               role="button"
               tabindex="0"
-              aria-label="Area drop file Target Environment. Tekan Enter atau Spasi untuk membuka pemilih file."
+              data-i18n-attr="aria-label:tool.dropzoneTargetAria"
               aria-describedby="dropzone-target-hint"
             >
               <svg
@@ -448,9 +449,9 @@
                 />
               </svg>
 
-              <p class="dropzone__text" id="dropzone-target-hint">
-                <strong>Seret file ke sini</strong><br />
-                atau pilih dari perangkat
+              <p class="dropzone__text" id="dropzone-target-hint" data-i18n-html="tool.dropzoneEmpty">
+                <strong>Drag file here</strong><br />
+                or choose from your device
               </p>
 
               <input
@@ -458,7 +459,7 @@
                 id="file-input-target"
                 class="visually-hidden"
                 accept="*"
-                aria-label="Pilih file Target Environment"
+                data-i18n-attr="aria-label:tool.fileInputTarget"
               />
 
               <button
@@ -466,26 +467,27 @@
                 class="dropzone__file-btn"
                 id="file-btn-target"
                 aria-controls="file-input-target"
+                data-i18n="tool.pickFile"
               >
-                Pilih File
+                Choose File
               </button>
             </div>
 
             <!-- Label textarea Target -->
-            <label for="textarea-target" class="textarea-label">
-              Atau tempel isi file di sini:
+            <label for="textarea-target" class="textarea-label" data-i18n="tool.pasteLabel">
+              Or paste the file contents here:
             </label>
 
             <!-- Textarea Target -->
             <textarea
               id="textarea-target"
               class="env-textarea"
-              placeholder="# Tempel isi .env.local atau .env.production di sini&#10;APP_NAME=envmoss&#10;DATABASE_URL=localhost"
+              data-i18n-attr="placeholder:tool.placeholderTarget;aria-label:tool.textareaTarget"
+              placeholder="# Paste the contents of .env.local or .env.production here&#10;APP_NAME=envmoss&#10;DATABASE_URL=localhost"
               spellcheck="false"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
-              aria-label="Konten Target Environment"
             ></textarea>
 
           </div>
@@ -501,7 +503,7 @@
     <!-- ==============================
          Action Bar
     ============================== -->
-    <div class="action-bar" role="group" aria-label="Aksi utama">
+    <div class="action-bar" role="group" data-i18n-attr="aria-label:tool.actions">
       <button
         type="button"
         class="btn btn--primary"
@@ -528,22 +530,22 @@
             stroke-linejoin="round"
           />
         </svg>
-        Bandingkan
+        <span data-i18n="tool.compare">Compare</span>
       </button>
 
       <button
         type="button"
         class="btn btn--secondary"
         id="btn-clear"
-        aria-label="Hapus semua input dan hasil"
+        data-i18n-attr="aria-label:tool.clearAllAria"
       >
-        Hapus Semua
+        <span data-i18n="tool.clearAll">Clear All</span>
       </button>
     </div>
 
-    <!-- Hint tombol Bandingkan (hanya terlihat oleh screen reader saat disabled) -->
-    <p id="compare-hint" class="visually-hidden">
-      Tombol aktif setelah kedua input Base dan Target terisi.
+    <!-- Hint tombol Compare (hanya terlihat oleh screen reader saat disabled) -->
+    <p id="compare-hint" class="visually-hidden" data-i18n="tool.compareHint">
+      The button activates once both Base and Target inputs are filled.
     </p>
 
     <!-- ==============================
@@ -552,7 +554,7 @@
     <section
       class="results-section"
       id="results-section"
-      aria-label="Hasil komparasi"
+      data-i18n-attr="aria-label:tool.results"
       aria-live="polite"
       aria-atomic="false"
     >
@@ -566,7 +568,7 @@
       class="empty-state"
       id="empty-state"
       role="status"
-      aria-label="Belum ada hasil komparasi"
+      data-i18n-attr="aria-label:tool.emptyAria"
     >
       <!-- Ikon lingkaran — ringan dan netral -->
       <svg
@@ -591,28 +593,28 @@
         <rect x="33" y="35" width="8"  height="2.5" rx="1.25" fill="currentColor" opacity="0.3" />
       </svg>
 
-      <h2 class="empty-state__title">Hasil komparasi akan muncul di sini</h2>
+      <h2 class="empty-state__title" data-i18n="tool.emptyTitle">Comparison results will appear here</h2>
 
-      <p class="empty-state__description">
-        Masukkan Base dan Target Environment, lalu tekan <strong>Bandingkan</strong>
-        untuk melihat perbedaan struktur key.
+      <p class="empty-state__description" data-i18n-html="tool.emptyDesc">
+        Enter Base and Target Environment, then press <strong>Compare</strong>
+        to see key structure differences.
       </p>
 
       <!-- Langkah-langkah singkat -->
-      <div class="empty-state__steps" aria-label="Langkah penggunaan">
+      <div class="empty-state__steps" data-i18n-attr="aria-label:tool.stepsAria">
         <div class="empty-state__step">
           <span class="empty-state__step-num" aria-hidden="true">1</span>
-          <span>Masukkan Base</span>
+          <span data-i18n="tool.stepEnterBase">Enter Base</span>
         </div>
         <span class="empty-state__step-sep" aria-hidden="true">›</span>
         <div class="empty-state__step">
           <span class="empty-state__step-num" aria-hidden="true">2</span>
-          <span>Masukkan Target</span>
+          <span data-i18n="tool.stepEnterTarget">Enter Target</span>
         </div>
         <span class="empty-state__step-sep" aria-hidden="true">›</span>
         <div class="empty-state__step">
           <span class="empty-state__step-num" aria-hidden="true">3</span>
-          <span>Tekan Bandingkan</span>
+          <span data-i18n="tool.stepCompare">Press Compare</span>
         </div>
       </div>
 
@@ -633,6 +635,14 @@
   <!-- JS modul: perilaku global (navbar, bahasa, tema) lalu interaksi Tool -->
   <script type="module" src="../js/site.js"></script>
   <script type="module" src="../js/app.js"></script>
+
+  <!-- Failsafe i18n: jika modul kamus gagal dimuat, lepaskan penanda pending
+       agar konten fallback English tetap terlihat dan tidak tersembunyi. -->
+  <script>
+    setTimeout(function () {
+      document.documentElement.removeAttribute('data-i18n-pending');
+    }, 3000);
+  </script>
 
 </body>
 </html>

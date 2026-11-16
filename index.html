@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -59,9 +59,9 @@
   <meta name="google-site-verification" content="UlgjpIQyIHUCMEOR-_iUBL0-BURcA9qFoJw3GOUBwCI" />
 
   <!-- Primary Meta Tags -->
-  <title>EnvMoss — Bandingkan File .env Secara Lokal &amp; Privat</title>
-  <meta name="title" content="EnvMoss — Bandingkan File .env Secara Lokal &amp; Privat" />
-  <meta name="description" content="EnvMoss adalah developer utility untuk membandingkan dua file environment (.env) langsung di browser. Temukan key yang hilang, duplikat, dan perbedaan value — tanpa mengunggah file Anda ke server." />
+  <title data-i18n="landing.title">EnvMoss — Compare .env Files Locally &amp; Privately</title>
+  <meta name="title" content="EnvMoss — Compare .env Files Locally &amp; Privately" />
+  <meta name="description" content="EnvMoss is a developer utility for comparing two environment files (.env) directly in the browser. Find missing keys, duplicates, and value differences — without uploading your files to a server." />
   <meta name="keywords" content="env comparison, .env diff, environment variables, dotenv, privacy-first, developer tools, local-first" />
   <meta name="author" content="nyomann-arch" />
   <meta name="robots" content="index, follow" />
@@ -70,8 +70,8 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://envmoss.vercel.app/" />
-  <meta property="og:title" content="EnvMoss — Bandingkan File .env Secara Lokal &amp; Privat" />
-  <meta property="og:description" content="Bandingkan struktur key dua file environment langsung di browser. Tidak ada upload, tidak ada backend." />
+  <meta property="og:title" content="EnvMoss — Compare .env Files Locally &amp; Privately" />
+  <meta property="og:description" content="Compare the key structure of two environment files directly in your browser. No upload, no backend." />
   <meta property="og:image" content="https://envmoss.vercel.app/assets/og-image.png" />
   <meta property="og:image:alt" content="EnvMoss — Privacy-First Local .env File Comparison &amp; Merge Tool" />
   <meta property="og:site_name" content="EnvMoss" />
@@ -79,8 +79,8 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://envmoss.vercel.app/" />
-  <meta name="twitter:title" content="EnvMoss — Bandingkan File .env Secara Lokal &amp; Privat" />
-  <meta name="twitter:description" content="Bandingkan struktur key dua file environment langsung di browser. Tidak ada upload, tidak ada backend." />
+  <meta name="twitter:title" content="EnvMoss — Compare .env Files Locally &amp; Privately" />
+  <meta name="twitter:description" content="Compare the key structure of two environment files directly in your browser. No upload, no backend." />
   <meta name="twitter:image" content="https://envmoss.vercel.app/assets/og-image.png" />
 
   <!-- Stylesheet: fondasi global lalu stylesheet khusus Landing -->
@@ -93,11 +93,11 @@
        Navbar global (fixed)
   ============================== -->
   <header class="site-header">
-    <nav class="site-navbar" aria-label="Navigasi utama">
+    <nav class="site-navbar" data-i18n-attr="aria-label:nav.aria">
       <div class="site-navbar__inner">
 
         <!-- Brand: mark + wordmark — satu-satunya tautan ke Landing -->
-        <a href="./" class="site-brand" aria-label="EnvMoss — ke halaman utama">
+        <a href="./" class="site-brand" data-i18n-attr="aria-label:nav.brandAria">
           <span class="site-brand__mark" aria-hidden="true">
             <!-- Ikon daun lumut — SVG lokal inline -->
             <svg
@@ -166,7 +166,7 @@
             </li>
           </ul>
 
-          <div class="site-lang" role="group" aria-label="Pilih bahasa antarmuka">
+          <div class="site-lang" role="group" data-i18n-attr="aria-label:nav.langAria">
             <button
               type="button"
               class="site-lang__btn"
@@ -186,7 +186,7 @@
             class="site-theme"
             id="site-theme-toggle"
             data-state="system"
-            aria-label="Ubah tema tampilan"
+            data-i18n-attr="aria-label:nav.themeAria"
           >
             <!-- Ikon terang (matahari) -->
             <svg
@@ -232,7 +232,7 @@
           </button>
 
           <!-- Indikator privasi ringkas -->
-          <span class="site-navbar__indicator" aria-label="Semua pemrosesan dilakukan di browser Anda">
+          <span class="site-navbar__indicator" data-i18n-attr="aria-label:nav.privacyAria">
             100% Client-Side
           </span>
 
@@ -243,53 +243,51 @@
   </header>
 
   <!-- ==============================
-       Main Content — Landing (kerangka awal Milestone 7)
+       Main Content — Landing
   ============================== -->
   <main class="site-main">
 
     <section class="landing-hero" aria-labelledby="landing-hero-title">
-      <h1 class="landing-hero__title" id="landing-hero-title">
-        Bandingkan file <code>.env</code> Anda tanpa meninggalkan browser
+      <h1 class="landing-hero__title" id="landing-hero-title" data-i18n-html="landing.heroTitle">
+        Compare your <code>.env</code> files without leaving your browser
       </h1>
-      <p class="landing-hero__lead">
-        EnvMoss membantu menemukan key yang hilang, key duplikat, dan perbedaan
-        value antara dua file environment — sepenuhnya diproses secara lokal di
-        perangkat Anda.
+      <p class="landing-hero__lead" data-i18n="landing.heroLead">
+        EnvMoss helps you find missing keys, duplicate keys, and value differences between two environment files — processed entirely locally on your device.
       </p>
       <div class="landing-hero__actions">
-        <a class="site-btn site-btn--primary" href="./app/">Buka Tool</a>
-        <a class="site-btn site-btn--secondary" href="./guide/">Baca Panduan</a>
+        <a class="site-btn site-btn--primary" href="./app/" data-i18n="landing.ctaTool">Open Tool</a>
+        <a class="site-btn site-btn--secondary" href="./guide/" data-i18n="landing.ctaGuide">Read the Guide</a>
       </div>
     </section>
 
     <section class="landing-section" aria-labelledby="landing-status-title">
-      <h2 class="landing-section__title" id="landing-status-title">Apa yang ditemukan EnvMoss</h2>
+      <h2 class="landing-section__title" id="landing-status-title" data-i18n="landing.statusTitle">What EnvMoss finds</h2>
       <ul class="landing-status-list">
         <li class="landing-status-item">
           <span class="landing-status-item__badge landing-status-item__badge--missing">Missing</span>
-          <span>Key ada di Base tetapi belum ada di Target.</span>
+          <span data-i18n="landing.statusMissing">Key exists in Base but not yet in Target.</span>
         </li>
         <li class="landing-status-item">
           <span class="landing-status-item__badge landing-status-item__badge--orphan">Orphan</span>
-          <span>Key tambahan yang hanya ada di Target.</span>
+          <span data-i18n="landing.statusOrphan">Extra key that exists only in Target.</span>
         </li>
         <li class="landing-status-item">
           <span class="landing-status-item__badge landing-status-item__badge--duplicate">Duplicate</span>
-          <span>Key yang ditulis lebih dari satu kali dalam satu file.</span>
+          <span data-i18n="landing.statusDuplicate">Key written more than once in a single file.</span>
         </li>
         <li class="landing-status-item">
           <span class="landing-status-item__badge landing-status-item__badge--mismatch">Mismatch</span>
-          <span>Value berbeda antar file — informasi, bukan error.</span>
+          <span data-i18n="landing.statusMismatch">Values differ between files — information, not an error.</span>
         </li>
       </ul>
     </section>
 
     <section class="landing-section" aria-labelledby="landing-privacy-title">
-      <h2 class="landing-section__title" id="landing-privacy-title">Privasi by design</h2>
-      <p class="landing-section__text">
-        File <code>.env</code> Anda tetap berada di browser. EnvMoss tidak
-        mengunggahnya ke server, tidak menyimpannya, dan tidak mengirimkannya ke
-        layanan pihak ketiga.
+      <h2 class="landing-section__title" id="landing-privacy-title" data-i18n="landing.privacyTitle">Privacy by design</h2>
+      <p class="landing-section__text" data-i18n-html="landing.privacyText">
+        Your <code>.env</code> files stay in your browser. EnvMoss does not
+        upload them to a server, does not store them, and does not send them to
+        third-party services.
       </p>
     </section>
 
@@ -306,6 +304,14 @@
 
   <!-- JS modul perilaku global: navbar aktif, bahasa, tema -->
   <script type="module" src="./js/site.js"></script>
+
+  <!-- Failsafe i18n: jika modul kamus gagal dimuat, lepaskan penanda pending
+       agar konten fallback English tetap terlihat dan tidak tersembunyi. -->
+  <script>
+    setTimeout(function () {
+      document.documentElement.removeAttribute('data-i18n-pending');
+    }, 3000);
+  </script>
 
 </body>
 </html>

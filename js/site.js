@@ -14,6 +14,8 @@
  *     menggagalkan halaman.
  */
 
+import { initI18n, applyI18n, onLanguageChange, t } from './i18n.js';
+
 (function () {
   'use strict';
 
@@ -69,12 +71,6 @@
   // Bahasa EN/ID
   // -------------------------------------------------------------------------
 
-  var THEME_LABELS = {
-    light: 'Terang',
-    dark: 'Gelap',
-    system: 'Sistem'
-  };
-
   function currentLang() {
     var lang = root.getAttribute('data-lang') || root.getAttribute('lang') || 'en';
     return lang === 'id' ? 'id' : 'en';
@@ -94,8 +90,10 @@
       var isActive = btn.getAttribute('data-lang-set') === lang;
       btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     }
-    // Catatan: kamus terjemahan diterapkan pada Milestone 8. Sampai saat itu
-    // preferensi bahasa tetap tersimpan dan atribut lang sudah benar.
+
+    // Terapkan kamus terjemahan ke seluruh DOM dan beri tahu modul halaman
+    // (mis. app.js) untuk render ulang konten dinamis.
+    applyI18n(lang);
   }
 
   function bindLangControls() {
@@ -154,10 +152,7 @@
     var toggle = document.getElementById('site-theme-toggle');
     if (toggle) {
       toggle.setAttribute('data-state', pref);
-      toggle.setAttribute(
-        'aria-label',
-        'Tema saat ini: ' + THEME_LABELS[pref] + '. Aktifkan untuk mengganti tema.'
-      );
+      refreshThemeLabel();
     }
 
     // Saat mode System aktif, ikuti perubahan preferensi OS secara langsung.
@@ -179,6 +174,18 @@
         systemThemeQuery.removeEventListener('change', onSystemThemeChange);
       }
     } catch (e) { /* matchMedia tidak tersedia — abaikan */ }
+  }
+
+  function refreshThemeLabel() {
+    var toggle = document.getElementById('site-theme-toggle');
+    if (!toggle) {
+      return;
+    }
+    var pref = currentThemePref();
+    toggle.setAttribute(
+      'aria-label',
+      t('theme.ariaState', { state: t('theme.' + pref) })
+    );
   }
 
   function onSystemThemeChange() {
@@ -204,7 +211,15 @@
   // Init
   // -------------------------------------------------------------------------
 
+  // Terapkan kamus bahasa dari preferensi bootstrap sebelum interaksi apa pun.
+  initI18n();
+
   markActiveNav();
   bindLangControls();
   bindThemeControl();
+
+  // Label aria kontrol tema mengikuti bahasa aktif.
+  onLanguageChange(function () {
+    refreshThemeLabel();
+  });
 })();
