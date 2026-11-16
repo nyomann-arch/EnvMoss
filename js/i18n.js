@@ -71,6 +71,9 @@ const STRINGS = {
     'landing.linkRepoTitle': 'Source on GitHub',
     'landing.linkRepoText': 'Inspect the code, report issues, or contribute.',
 
+    // --- Footer global ---
+    'footer.copyright': '© 2026 EnvMoss - Open Source under MIT License',
+
     // --- Guide ---
     'guide.title': 'Guide — EnvMoss',
     'guide.h1': 'EnvMoss Guide',
@@ -264,6 +267,9 @@ const STRINGS = {
     'landing.linkGuideText': 'Panduan penggunaan langkah demi langkah, sintaks yang didukung, dan pemecahan masalah.',
     'landing.linkRepoTitle': 'Kode Sumber di GitHub',
     'landing.linkRepoText': 'Periksa kode, laporkan masalah, atau berkontribusi.',
+
+    // --- Footer global ---
+    'footer.copyright': '© 2026 EnvMoss - Open Source di bawah Lisensi MIT',
 
     // --- Guide ---
     'guide.title': 'Panduan — EnvMoss',

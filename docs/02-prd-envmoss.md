@@ -970,38 +970,60 @@ Gunakan static HTML dan navigasi tautan biasa. Tidak perlu SPA router. Jika stru
 - Tidak terlihat kilatan tema yang salah sebelum CSS pertama kali dirender pada ketiga halaman.
 - Nilai tema tidak valid dan kegagalan localStorage/matchMedia menghasilkan fallback yang aman.
 
-### Milestone 10 — Landing Page
+### Milestone 10 — Verifikasi Landing Page
 
-**Tujuan:** Membuat halaman pengenalan produk yang menjelaskan EnvMoss dengan cepat dan mengarahkan pengunjung ke Tool atau Guide.
+**Tujuan:** Memastikan Landing Page sederhana yang sudah ada dan dipertahankan setelah pembatalan redesign Milestone 10 berfungsi benar dalam arsitektur multi-halaman. Milestone ini berfokus pada pengujian, verifikasi, dan perbaikan bug integrasi yang terbukti; bukan pembangunan ulang, redesign, atau penambahan section.
 
-**Arah referensi:** gunakan PomeloO (`https://pomeloo.netlify.app/`) sebagai inspirasi untuk hirarki konten, navigasi sederhana, penyampaian manfaat, langkah penggunaan, dan komunikasi privasi. Jangan menyalin teks, aset, merek, atau layout secara persis.
+**Keputusan scope:**
+
+- Gunakan Landing Page yang saat ini ada di route `/` sebagai baseline desain dan konten.
+- Pertahankan struktur sederhana yang disukai: headline dan deskripsi singkat, CTA menuju Tool dan Guide, empat status EnvMoss, serta penjelasan privasi.
+- Jangan mengembalikan layout Landing yang lebih panjang/padat dari eksperimen Milestone 10 sebelumnya.
+- Jangan menambahkan section baru seperti testimonial/social proof, storytelling, pricing, FAQ, feature grid tambahan, atau dekorasi hanya untuk membuat halaman lebih panjang.
+- Jangan mengganti desain hanya karena preferensi estetika agent. Perubahan visual hanya boleh dilakukan untuk memperbaiki bug, aksesibilitas, responsivitas, konsistensi Design System, atau ketidaksesuaian terhadap keputusan produk yang terdokumentasi.
+- Jangan mengubah perilaku atau source code Tool, comparison engine, parser, maupun output generator kecuali ditemukan regresi yang secara langsung disebabkan integrasi halaman; setiap perubahan semacam itu harus sekecil mungkin dan dilaporkan.
 
 **Pekerjaan:**
 
-1. Bangun Landing pada route `/`.
-2. Gunakan navbar global dari Milestone 7.
-3. Buat hero ringkas dengan headline berorientasi pada masalah/hasil, bukan pengulangan nama EnvMoss sebagai judul besar.
-4. Tampilkan CTA utama menuju `/app/` dan CTA sekunder menuju `/guide/`.
-5. Tampilkan gambaran singkat alur kerja tiga langkah: masukkan Base dan Target, bandingkan, lalu tindak lanjuti hasil.
-6. Jelaskan empat status komparasi secara ringkas dengan penekanan bahwa Mismatch adalah informasi, Orphan tidak otomatis obsolete, dan Duplicate dilaporkan per file.
-7. Tampilkan dua output utama: Markdown Checklist dan Merged `.env`.
-8. Komunikasikan privasi secara akurat: isi file diproses lokal di browser dan tidak diunggah oleh aplikasi. Jangan mengklaim website dapat dibuka offline.
-9. Gunakan screenshot aktual aplikasi jika tersedia dan sudah diverifikasi. Jangan menggunakan mockup AI sebagai bukti bahwa fitur sudah berjalan.
-10. Hindari ilustrasi tanaman besar di kanan atas dan dekorasi hero yang tidak membantu. Pertahankan Moss Theme melalui warna, ruang kosong, tipografi, dan detail kecil.
-11. Sediakan link ke Guide dan Repository.
-12. Seluruh konten Landing harus tersedia dalam EN dan ID serta mendukung Light/Dark.
+1. Periksa route `/` dan pastikan halaman yang ditampilkan adalah Landing sederhana yang sudah ada, bukan halaman Tool dan bukan versi redesign yang dibatalkan.
+2. Verifikasi navbar global dari Milestone 7: logo/wordmark EnvMoss mengarah ke `/`, tautan Tool mengarah ke `/app/`, tautan Guide mengarah ke `/guide/`, serta kontrol bahasa dan tema tersedia sesuai implementasi Milestone 8 dan 9.
+3. Verifikasi CTA utama pada Landing mengarah ke `/app/` dan CTA sekunder mengarah ke `/guide/`. Pastikan tautan Repository, jika ditampilkan, menuju repository resmi yang benar.
+4. Verifikasi konten inti tetap ringkas dan akurat: tujuan EnvMoss, empat status (Missing, Orphan, Duplicate, Mismatch), dan privasi client-side. Jangan menambahkan klaim bahwa Mismatch adalah error, Orphan pasti usang, atau website dapat digunakan offline tanpa koneksi.
+5. Verifikasi tidak ada value `.env`, secret, kredensial, atau data pengguna pada teks, screenshot, metadata, maupun contoh visual Landing.
+6. Verifikasi seluruh teks Landing tersedia dalam EN dan ID, termasuk headline, deskripsi, CTA, heading section, label status, privacy statement, footer, tooltip, dan accessible labels yang relevan.
+7. Verifikasi Light, Dark, dan System (sesuai kontrol tema yang telah disetujui) pada Landing. Pastikan warna teks, background, border, link, tombol, badge status, hover, dan focus tetap terbaca.
+8. Verifikasi bootstrap preferensi pada `<head>` berjalan sebelum stylesheet dan tidak menimbulkan flash tema atau bahasa yang salah pada first paint. Uji juga fallback jika `localStorage` tidak tersedia atau nilainya tidak valid.
+9. Verifikasi relative path seluruh CSS, JavaScript, gambar, ikon, link internal, dan aset Landing. Uji route pada deployment root dan simulasi base path subdirectory yang digunakan untuk memeriksa kompatibilitas GitHub Pages project site.
+10. Verifikasi CSS Landing terisolasi menggunakan namespace yang ditetapkan dalam Design System. Pastikan stylesheet Landing tidak mengubah tampilan atau layout Tool dan Guide.
+11. Uji responsivitas pada desktop, tablet, dan mobile. Pastikan headline tidak terpotong, CTA mudah digunakan, empat status tetap terbaca, navbar tidak menutupi konten, dan tidak muncul horizontal overflow yang tidak disengaja.
+12. Uji aksesibilitas dasar: navigasi keyboard, urutan focus, focus indicator, semantic heading, accessible name pada kontrol, kontras warna, dan reduced motion jika terdapat animasi.
+13. Periksa browser console dan Network untuk error, resource 404, request pihak ketiga yang tidak disetujui, atau indikasi pengiriman isi `.env`. Landing tidak boleh memuat analytics, CDN, external font, atau dependency baru.
+14. Perbaiki hanya masalah yang ditemukan dalam verifikasi. Hindari refactor atau perubahan visual yang tidak diperlukan.
+15. Simpan bukti pengujian di `scratch/verify-m10`, mengikuti pola artefak verifikasi milestone sebelumnya.
+16. Jangan menghapus, menimpa, atau mengubah artefak `scratch/verify-m3` sampai atau dan `scratch/verify-m11` yang sudah ada. Periksa pola penamaan dan isi folder `scratch/` terlebih dahulu; buat hanya file baru yang diperlukan di `scratch/verify-m10`.
+17. Jangan melakukan commit, push, release, atau deployment production tanpa persetujuan pengguna.
 
-**Hasil yang diharapkan:** halaman depan yang ringkas, informatif, dan memiliki jalur jelas menuju Tool.
+**Hasil yang diharapkan:** Landing sederhana tetap dipertahankan, seluruh integrasi halaman bekerja, tidak ada regresi visual/fungsional yang diketahui, dan hasil verifikasi terdokumentasi di `scratch/verify-m10`.
 
 **Acceptance Criteria:**
-- `/` menampilkan Landing, bukan lagi halaman Tool.
-- CTA utama mengarah ke `/app/`.
-- CTA sekunder mengarah ke `/guide/`.
-- Logo EnvMoss kembali ke Landing; tidak ada item nav `Home` atau `Landing`.
-- Konten tersedia dalam EN/ID.
-- Tema Light/Dark diterapkan.
-- Tidak ada klaim offline atau klaim privasi absolut.
-- Tidak ada ilustrasi botani besar yang mengalihkan fokus.
+
+- Route `/` menampilkan Landing sederhana yang telah dipilih sebagai baseline.
+- Tidak ada pembangunan ulang atau penambahan section yang tidak diminta.
+- CTA utama menuju `/app/` dan CTA sekunder menuju `/guide/`.
+- Logo EnvMoss mengarah ke `/`; navbar tidak memiliki item bernama `Home` atau `Landing`.
+- Link Repository, jika ada, mengarah ke repository resmi.
+- Informasi empat status dan privasi akurat serta tidak menampilkan value atau secret.
+- Seluruh konten Landing tersedia dalam EN dan ID.
+- Light/Dark/System bekerja sesuai preferensi dan tidak menimbulkan FOUC yang terlihat.
+- Relative path aset dan navigasi bekerja pada root path serta base path subdirectory yang diuji.
+- CSS Landing terisolasi dan tidak merusak Tool atau Guide.
+- Layout dapat digunakan pada desktop, tablet, dan mobile tanpa overflow yang tidak disengaja.
+- Pemeriksaan keyboard, focus, semantic structure, dan kontras dasar selesai.
+- Tidak ada error console atau resource 404 yang belum dijelaskan pada alur Landing.
+- Tidak ada request analitik/CDN/dependency pihak ketiga yang tidak disetujui dan tidak ada pengiriman isi `.env`.
+- Bukti dan laporan pengujian tersedia di `scratch/verify-m10`.
+- Artefak verifikasi milestone lain tidak dihapus atau ditimpa.
+- Tidak ada commit, push, release, atau deployment production tanpa persetujuan pengguna.
 
 ### Milestone 11 — Guide Page
 
