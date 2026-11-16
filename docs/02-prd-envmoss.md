@@ -2,8 +2,9 @@
 
 **Nama Produk:** EnvMoss  
 **Deskripsi positioning (untuk dokumentasi, bukan teks UI):** Alat untuk membandingkan file environment secara lokal dan menjaga isi file tetap berada di browser.  
-**Versi:** MVP v1.0  
-**Status:** Siap menjadi acuan implementasi setelah disetujui pemilik proyek  
+**Versi dokumen:** 1.1  
+**Versi produk baseline:** v1.0.0 (sudah dirilis)  
+**Status:** Baseline v1.0.0 dipertahankan; Milestone 7–12 adalah roadmap pengembangan web yang menunggu eksekusi  
 **Jenis Produk:** Web utility tool untuk developer  
 **Arsitektur:** Aplikasi web statis, pemrosesan 100% di browser
 
@@ -91,7 +92,7 @@ Value yang berbeda tidak otomatis berarti kesalahan. Mismatch hanya memberikan i
 
 MVP hanya menyelesaikan satu pekerjaan utama: membandingkan struktur dua file environment dan menghasilkan dua output yang berguna.
 
-## 6. Ruang Lingkup MVP v1.0
+## 6. Ruang Lingkup Baseline v1.0.0
 
 ### 6.1 Termasuk dalam scope
 
@@ -110,7 +111,7 @@ MVP hanya menyelesaikan satu pekerjaan utama: membandingkan struktur dua file en
 - Tampilan responsif dan aksesibel.
 - Pemrosesan lokal tanpa backend.
 
-### 6.2 Di luar scope
+### 6.2 Di luar scope baseline v1.0.0
 
 - Backend, API server, database, dan autentikasi.
 - Cloud storage dan sinkronisasi file.
@@ -123,6 +124,8 @@ MVP hanya menyelesaikan satu pekerjaan utama: membandingkan struktur dua file en
 - Kolaborasi tim.
 - Laporan PDF.
 - Dukungan penuh terhadap seluruh variasi parser dotenv.
+- Landing page, Guide page, pilihan bahasa EN/ID, dan Dark Mode (direncanakan pada roadmap setelah v1.0.0).
+- CLI Tool dan distribusi melalui npm/npx (jalur masa depan yang belum disetujui untuk implementasi).
 - Multiline values.
 - Variable interpolation seperti `${HOST}:${PORT}`.
 - Validasi apakah value sesuai dengan kebutuhan aplikasi.
@@ -443,7 +446,7 @@ Tombol **Hapus Semua** harus:
 - Menghapus state input dan hasil yang disimpan di memori aplikasi.
 - Mengembalikan area hasil ke empty state.
 
-Tidak boleh ada isi file yang tersisa di browser storage karena aplikasi memang tidak menggunakan penyimpanan tersebut.
+Tidak boleh ada isi file yang tersisa di browser storage. Pada roadmap berikutnya, `localStorage` hanya boleh digunakan untuk preferensi UI non-sensitif yang diizinkan secara eksplisit: `envmoss:language` dan `envmoss:theme`.
 
 ## 13. Arsitektur Teknis
 
@@ -491,6 +494,87 @@ Tanggung jawab modul:
 
 Struktur dapat disesuaikan jika repository sudah memiliki susunan yang berjalan, tetapi pemisahan tanggung jawab harus dipertahankan.
 
+### 13.2.1 Struktur halaman dan stylesheet setelah roadmap multi-halaman
+
+Struktur statis yang direncanakan setelah Milestone 7:
+
+```text
+envmoss/
+├── index.html                  # Landing page
+├── app/
+│   └── index.html              # Comparison Tool
+├── guide/
+│   └── index.html              # Guide
+├── css/
+│   ├── styles.css              # Reset, design tokens, tipografi, dan komponen global .site-
+│   ├── tool.css                # Style khusus Comparison Tool (.tool-)
+│   ├── landing.css             # Style khusus Landing (.landing-)
+│   └── guide.css               # Style khusus Guide (.guide-)
+├── js/
+│   ├── env-engine.js           # Core parsing dan komparasi
+│   ├── output-generator.js     # Markdown dan Merged .env
+│   ├── app.js                  # Interaksi Comparison Tool
+│   ├── i18n.js                 # Kamus dan penerapan EN/ID
+│   └── site.js                 # Navigasi, tema, dan perilaku lintas halaman
+├── assets/                     # Aset lokal bersama jika diperlukan
+├── docs/
+├── README.md                   # English
+├── README.id.md                # Bahasa Indonesia
+└── LICENSE
+```
+
+Struktur ini adalah target yang disarankan, bukan alasan untuk memindahkan atau membuat file sebelum milestone terkait. Agent wajib memeriksa repository aktual dan mempertahankan file yang sudah ada bila tanggung jawabnya masih tepat. Nama stylesheet boleh disesuaikan jika repository sudah memiliki struktur setara, tetapi pemisahan scope dan namespacing tetap wajib.
+
+### 13.2.2 Strategi path relatif untuk static hosting
+
+EnvMoss menggunakan halaman HTML statis dan ditargetkan kompatibel dengan Vercel root domain serta GitHub Pages yang mungkin menggunakan subpath repository. Karena itu, gunakan **relative path**, bukan root-absolute path.
+
+Contoh:
+
+| Lokasi dokumen | Resource/navigasi | Path yang digunakan |
+|---|---|---|
+| `index.html` | CSS global | `./css/styles.css` |
+| `index.html` | JS global | `./js/site.js` |
+| `index.html` | Tool | `./app/` |
+| `index.html` | Guide | `./guide/` |
+| `app/index.html` | CSS global | `../css/styles.css` |
+| `app/index.html` | JS Tool | `../js/app.js` |
+| `app/index.html` | Landing | `../` |
+| `app/index.html` | Guide | `../guide/` |
+| `guide/index.html` | CSS global | `../css/styles.css` |
+| `guide/index.html` | JS global | `../js/site.js` |
+| `guide/index.html` | Tool | `../app/` |
+| `guide/index.html` | Landing | `../` |
+
+Aturan wajib:
+
+- Hindari path yang diawali `/` untuk CSS, JavaScript, gambar, ikon, dan navigasi internal.
+- Jangan menggunakan `<base href="/">`.
+- Path `url(...)` pada CSS relatif terhadap lokasi stylesheet. Dari file di `css/` menuju folder `assets/` di root, gunakan `../assets/...`.
+- Import ES Modules relatif terhadap file JavaScript pengimpor. Contoh: `import { compareEnvFiles } from './env-engine.js'` di dalam `js/app.js`.
+- Gunakan URL direktori dengan trailing slash seperti `./app/` dan `../guide/`.
+- Uji direct navigation, refresh, dan pemuatan aset pada setiap route. Bila GitHub Pages project site menjadi target, uji juga dengan base path repository, bukan hanya root domain Vercel.
+
+### 13.2.3 Bootstrap preferensi dan pencegahan FOUC
+
+Setiap halaman (`/`, `/app/`, dan `/guide/`) harus menerapkan preferensi tema dan bahasa sebelum browser menampilkan stylesheet dan teks halaman.
+
+Gunakan skrip inline kecil, sinkron, dan blocking di dalam `<head>`, setelah meta charset/viewport dan sebelum `<link rel="stylesheet">`. Skrip tidak boleh memakai `async`, `defer`, `type="module"`, timer, atau request jaringan.
+
+Skrip harus:
+
+1. Membaca `envmoss:theme`, menerima hanya `light`, `dark`, atau `system`.
+2. Jika tema `system` atau belum tersimpan, membaca `prefers-color-scheme` dan menetapkan tema aktual `light` atau `dark` pada `<html>` sebelum CSS dihitung.
+3. Membaca `envmoss:language`, menerima hanya `en` atau `id`.
+4. Jika bahasa belum tersimpan, memilih `id` atau `en` berdasarkan bahasa browser yang didukung dan fallback ke `en`.
+5. Mengatur atribut `<html lang="...">` serta penanda bahasa awal sebelum konten dirender.
+6. Menambahkan penanda sementara seperti `data-i18n-pending="true"` sampai modul i18n menerapkan semua teks aktif.
+7. Membungkus akses `localStorage` dan `matchMedia` dengan fallback yang aman; kegagalan API tidak boleh membuat aplikasi gagal.
+
+Menetapkan `lang` tidak otomatis menerjemahkan teks. Semua teks yang perlu diterjemahkan harus ditandai dan ditahan dari tampilan selama proses i18n awal, tanpa menghilangkan struktur layout. Setelah kamus diterapkan, modul i18n menghapus penanda pending. Jika penerapan kamus gagal, fallback ke English dan lepaskan penanda agar halaman tidak tersembunyi selamanya.
+
+Skrip bootstrap pada ketiga halaman harus memiliki perilaku identik. Key dan nilai preferensi tetap mengikuti Bagian 14.
+
 ### 13.3 Batasan jaringan dan hosting
 
 Aplikasi tidak memerlukan backend. Hosting statis hanya menyajikan berkas aplikasi. Tidak boleh ada request runtime yang mengirim data input atau secret.
@@ -500,7 +584,8 @@ Aplikasi tidak memerlukan backend. Hosting statis hanya menyajikan berkas aplika
 - Tidak ada upload isi file.
 - Tidak ada API pemrosesan.
 - Tidak ada database atau cloud storage.
-- Tidak ada localStorage, sessionStorage, IndexedDB, cookies, atau Cache Storage untuk isi file.
+- Isi file, key, value, hasil komparasi, dan output tidak boleh disimpan ke localStorage, sessionStorage, IndexedDB, cookies, atau Cache Storage.
+- Pengecualian terbatas: hanya preferensi bahasa (`envmoss:language`) dan tema (`envmoss:theme`) yang boleh disimpan di localStorage; bila storage gagal, aplikasi tetap berfungsi.
 - Tidak ada analytics atau telemetry pihak ketiga.
 - Tidak ada external CDN atau font eksternal.
 - Value environment variable tidak boleh ditampilkan dalam hasil.
@@ -611,7 +696,7 @@ Pernyataan privasi yang ditampilkan di dekat area input atau tombol utama:
 - Uji responsivitas dan aksesibilitas dasar.
 - Publikasikan ke static hosting.
 
-**Hasil:** MVP v1.0 siap digunakan secara publik.
+**Hasil:** Baseline web EnvMoss v1.0.0 siap digunakan secara publik. Milestone 1–6 merupakan catatan baseline dan tidak perlu diulang kecuali ada bug atau regresi.
 
 ## 17. Acceptance Criteria
 
@@ -750,8 +835,288 @@ Keberhasilan MVP dinilai berdasarkan:
 
 ---
 
-## Definisi Akhir MVP
+## 21. Roadmap Pengembangan Setelah v1.0.0
 
-EnvMoss v1.0 adalah web utility tool statis yang membandingkan dua file environment secara lokal di browser, mendeteksi Missing, Orphan, Duplicate, dan Mismatch, serta menghasilkan Markdown Checklist dan Merged `.env` tanpa mengunggah isi file ke server.
+Bagian ini merencanakan pengembangan website setelah rilis stabil v1.0.0. Fitur-fitur di bawah **belum dianggap tersedia** sampai milestone terkait benar-benar diimplementasikan dan diverifikasi.
 
-**Prinsip produk:** Satu masalah yang spesifik, solusi yang dapat dipercaya, privasi yang jelas, dan kompleksitas minimum.
+### 21.1 Tujuan roadmap
+
+Mengembangkan EnvMoss dari satu halaman utility menjadi pengalaman produk web yang lebih lengkap tanpa mengubah fondasi utamanya:
+
+- Tetap berupa website statis tanpa backend.
+- Tetap menggunakan HTML, CSS, dan Vanilla JavaScript.
+- Isi file `.env` tetap diproses sepenuhnya di browser.
+- Tidak menambahkan framework, package manager, bundler, CDN, analytics, atau layanan pihak ketiga.
+- Memperbaiki navigasi, aksesibilitas, kemudahan belajar, dan jangkauan pengguna melalui halaman Landing, Tool, Guide, bahasa EN/ID, dan tema gelap.
+
+### 21.2 Informasi arsitektur halaman yang direncanakan
+
+Rute statis yang direkomendasikan:
+
+| URL | Halaman | Tujuan |
+|---|---|---|
+| `/` | Landing | Memperkenalkan EnvMoss dan mengarahkan pengguna ke Tool atau Guide |
+| `/app/` | Tool | Menjalankan perbandingan file environment; merupakan rumah bagi fungsi v1.0.0 yang sudah ada |
+| `/guide/` | Guide | Menyediakan petunjuk penggunaan, penjelasan status, batas parser, dan troubleshooting |
+
+Gunakan static HTML dan navigasi tautan biasa. Tidak perlu SPA router. Jika struktur hosting atau repository membuat rute di atas tidak praktis, agent harus memeriksa konfigurasi Vercel terlebih dahulu dan mengajukan alternatif URL statis yang setara sebelum mengubah rute.
+
+**Aturan navigasi:** logo/mark dan wordmark EnvMoss selalu mengarah ke `/`. Tidak boleh ada menu khusus bernama Home atau Landing. Navbar boleh menyediakan tautan ke Tool dan Guide.
+
+### Milestone 7 — Fondasi Multi-Halaman dan Navbar Tetap
+
+**Tujuan:** Menyediakan struktur statis multi-halaman dan navigasi global sebelum membuat konten Landing dan Guide.
+
+**Prasyarat:** Baseline v1.0.0 sudah berjalan. Agent wajib menginspeksi struktur repository, URL Vercel, dan path aset sebelum memindahkan halaman Tool.
+
+**Pekerjaan:**
+
+1. Dokumentasikan struktur rute statis: `/`, `/app/`, dan `/guide/`.
+2. Pindahkan atau adaptasikan halaman Tool yang sekarang berada di root ke `/app/` tanpa mengubah core comparison engine.
+3. Jadikan `/` sebagai Landing page awal; konten lengkap Landing diselesaikan pada Milestone 10.
+4. Buat kerangka `/guide/`; isi panduan diselesaikan pada Milestone 11.
+5. Buat navbar global dengan logo/mark dan wordmark `EnvMoss`, tautan `Tool`, tautan `Guide`, kontrol bahasa EN/ID, dan kontrol tema.
+6. Logo EnvMoss menjadi satu-satunya navigasi global yang mengarah ke Landing. Jangan tambahkan menu `Home` atau `Landing`.
+7. Terapkan navbar `position: fixed`, tinggi navbar yang konsisten, `z-index` yang wajar, dan offset konten agar tidak tertutup.
+8. Terapkan strategi relative path sesuai Bagian 13.2.2 pada semua HTML, navigasi, stylesheet, script, gambar, dan ikon. Jangan memakai root-absolute path atau `<base href="/">`.
+9. Pastikan import ES Modules dan `url(...)` CSS tetap mengarah ke resource yang benar sesuai lokasi file pengimpor/stylesheet.
+10. Tambahkan class konteks halaman pada `<body>`: `page--landing`, `page--tool`, dan `page--guide`.
+11. Terapkan pemisahan stylesheet dan namespacing sesuai Design System; jangan membiarkan style halaman baru memengaruhi Tool.
+12. Buat kerangka head bootstrap sesuai Bagian 13.2.3 agar atribut preferensi tersedia sebelum stylesheet; penyelesaian terjemahan awal ditangani pada Milestone 8.
+13. Gunakan navigasi halaman statis biasa; jangan menambahkan router atau framework.
+14. Pertahankan seluruh fungsi Tool v1.0.0, termasuk input, komparasi, output, dan Hapus Semua.
+
+**Hasil yang diharapkan:** ketiga URL statis dapat dibuka langsung, navbar konsisten, dan fungsi Tool tidak mengalami regresi.
+
+**Acceptance Criteria:**
+- `/`, `/app/`, dan `/guide/` dapat dibuka langsung melalui hosting target.
+- Refresh pada `/app/` dan `/guide/` tidak menghasilkan 404.
+- Logo EnvMoss dari setiap halaman mengarah ke `/`.
+- Tidak terdapat tautan navbar yang secara eksplisit bernama Home atau Landing.
+- Tautan Tool dan Guide bekerja.
+- Navbar tetap berada di bagian atas ketika halaman digulir.
+- Navbar tidak menutupi konten, target anchor, atau elemen yang sedang difokuskan.
+- Seluruh aset dan ES Modules berhasil dimuat di ketiga rute.
+- Navigasi dan aset menggunakan relative path dan tidak bergantung pada root domain.
+- Tidak ada stylesheet Landing/Guide yang mengubah komponen Tool.
+- Fitur komparasi v1.0.0 tetap berfungsi.
+
+### Milestone 8 — Internasionalisasi Bahasa Inggris dan Bahasa Indonesia
+
+**Tujuan:** Membuat seluruh pengalaman EnvMoss tersedia dalam English dan Bahasa Indonesia.
+
+**Pekerjaan:**
+
+1. Buat kamus terjemahan lokal, misalnya `js/i18n.js`, tanpa API terjemahan atau request jaringan.
+2. Terapkan kontrol EN/ID di navbar semua halaman.
+3. Terjemahkan seluruh teks pada halaman Tool, termasuk label input, tombol, status, parsing warning, empty state, toast, error, konfirmasi, tooltip, dan aria-label.
+4. Terjemahkan seluruh konten Landing dan Guide.
+5. Pastikan teks yang dihasilkan oleh Markdown Checklist dan komentar tambahan pada Merged `.env` mengikuti bahasa aktif, jika output tersebut memang menampilkan kalimat natural.
+6. Pertahankan nama teknis dan nama key apa adanya; jangan menerjemahkan isi key environment variable.
+7. Perbarui `document.documentElement.lang` menjadi `en` atau `id` sesuai bahasa aktif.
+8. Bahasa awal mengikuti preferensi tersimpan. Jika belum ada, deteksi bahasa browser yang didukung (`id` atau `en`), lalu gunakan English sebagai fallback.
+9. Simpan hanya kode bahasa ke `localStorage` dengan key `envmoss:language`.
+10. Jika `localStorage` tidak tersedia atau gagal diakses, kontrol bahasa tetap berfungsi dalam memori.
+11. Buat `README.md` berbahasa Inggris dan `README.id.md` berbahasa Indonesia. Letakkan tautan silang bahasa di dekat bagian atas kedua README.
+12. Pastikan kedua README memuat informasi inti yang sepadan dan tidak mengklaim fitur yang belum dirilis.
+13. Terapkan skrip bootstrap bahasa inline, sinkron, dan blocking pada `<head>` setiap halaman sebelum stylesheet. Gunakan key `envmoss:language`, validasi nilai `en`/`id`, dan fallback bahasa browser/English sesuai Bagian 13.2.3.
+14. Terapkan penanda `data-i18n-pending` pada first paint. Pastikan teks yang diterjemahkan tidak menampilkan bahasa fallback sebelum kamus aktif diterapkan.
+15. Setelah penerjemahan selesai, lepaskan penanda pending. Jika penerjemahan gagal, gunakan fallback English dan lepaskan penanda agar konten tidak tersembunyi selamanya.
+
+**Hasil yang diharapkan:** pengguna dapat berpindah bahasa dari halaman mana pun tanpa reload yang tidak perlu dan tanpa teks antarmuka yang tertinggal dalam bahasa lain.
+
+**Acceptance Criteria:**
+- EN dan ID tersedia di Landing, Tool, dan Guide.
+- Semua teks UI statis dan dinamis memiliki terjemahan.
+- Perubahan bahasa memperbarui atribut `lang` pada HTML.
+- Bahasa yang dipilih bertahan setelah refresh jika storage tersedia.
+- Aplikasi tetap berfungsi jika localStorage diblokir.
+- Isi file `.env` tidak pernah disimpan sebagai bagian dari preferensi bahasa.
+- `README.md` berbahasa Inggris dan `README.id.md` berbahasa Indonesia tersedia serta saling tertaut.
+- Pada first paint, atribut `lang` dan bahasa pilihan sudah ditetapkan oleh skrip blocking di `<head>` sebelum konten terlihat.
+- Tidak ada teks bahasa default yang sempat terlihat sebelum terjemahan aktif diterapkan.
+- Jika inisialisasi i18n gagal, fallback English ditampilkan dan halaman tidak tertahan dalam keadaan tersembunyi.
+
+### Milestone 9 — Dark Mode dan Preferensi Tema
+
+**Tujuan:** Menyediakan tema terang dan gelap yang konsisten di seluruh halaman.
+
+**Pekerjaan:**
+
+1. Perluas design tokens agar setiap warna inti memiliki pasangan Light dan Dark.
+2. Implementasikan tema menggunakan atribut seperti `data-theme="light"` dan `data-theme="dark"` pada elemen `<html>`.
+3. Sediakan kontrol tema yang mudah ditemukan pada navbar.
+4. Jika belum ada preferensi tersimpan, ikuti `prefers-color-scheme` dari sistem operasi.
+5. Beri pengguna pilihan eksplisit Light, Dark, atau System bila desain kontrol memungkinkan; jika UI hanya berupa toggle, setidaknya tetap sediakan mekanisme kembali ke System.
+6. Simpan hanya preferensi tema ke `localStorage` dengan key `envmoss:theme` dan nilai `light`, `dark`, atau `system`.
+7. Tangani kondisi storage tidak tersedia dengan fallback sistem.
+8. Terapkan tema pada Landing, Tool, Guide, navbar fixed, input, diff board, summary, badge, tombol, link, tooltip, dialog, dan feedback.
+9. Periksa kontras warna status dan focus indicator pada kedua tema.
+10. Terapkan skrip bootstrap tema inline, sinkron, dan blocking pada `<head>` setiap halaman sebelum stylesheet. Skrip membaca `envmoss:theme`, memvalidasi `light`/`dark`/`system`, dan menerapkan tema aktual sebelum first paint.
+11. Jika preferensi tidak tersedia atau bernilai `system`, gunakan `prefers-color-scheme` melalui `matchMedia`. Jika API tidak tersedia, fallback ke Light.
+12. Bungkus akses `localStorage` dan `matchMedia` dengan fallback aman. Jangan biarkan kegagalan salah satu API menggagalkan rendering.
+13. Pastikan skrip bootstrap tema pada Landing, Tool, dan Guide memiliki perilaku identik.
+
+**Hasil yang diharapkan:** tema gelap dan terang dapat digunakan pada seluruh halaman tanpa komponen yang kehilangan keterbacaan.
+
+**Acceptance Criteria:**
+- Dark Mode tersedia di Landing, Tool, dan Guide.
+- Pilihan Light/Dark/System bekerja sesuai desain yang disetujui.
+- Preferensi tema bertahan setelah refresh jika storage tersedia.
+- Fallback sistem bekerja jika belum ada preferensi.
+- Aplikasi tidak gagal ketika localStorage tidak tersedia.
+- Badge status, teks, border, input, dan focus state terbaca pada kedua tema.
+- Tidak ada isi file atau hasil komparasi yang disimpan bersama preferensi tema.
+- Tidak terlihat kilatan tema yang salah sebelum CSS pertama kali dirender pada ketiga halaman.
+- Nilai tema tidak valid dan kegagalan localStorage/matchMedia menghasilkan fallback yang aman.
+
+### Milestone 10 — Landing Page
+
+**Tujuan:** Membuat halaman pengenalan produk yang menjelaskan EnvMoss dengan cepat dan mengarahkan pengunjung ke Tool atau Guide.
+
+**Arah referensi:** gunakan PomeloO (`https://pomeloo.netlify.app/`) sebagai inspirasi untuk hirarki konten, navigasi sederhana, penyampaian manfaat, langkah penggunaan, dan komunikasi privasi. Jangan menyalin teks, aset, merek, atau layout secara persis.
+
+**Pekerjaan:**
+
+1. Bangun Landing pada route `/`.
+2. Gunakan navbar global dari Milestone 7.
+3. Buat hero ringkas dengan headline berorientasi pada masalah/hasil, bukan pengulangan nama EnvMoss sebagai judul besar.
+4. Tampilkan CTA utama menuju `/app/` dan CTA sekunder menuju `/guide/`.
+5. Tampilkan gambaran singkat alur kerja tiga langkah: masukkan Base dan Target, bandingkan, lalu tindak lanjuti hasil.
+6. Jelaskan empat status komparasi secara ringkas dengan penekanan bahwa Mismatch adalah informasi, Orphan tidak otomatis obsolete, dan Duplicate dilaporkan per file.
+7. Tampilkan dua output utama: Markdown Checklist dan Merged `.env`.
+8. Komunikasikan privasi secara akurat: isi file diproses lokal di browser dan tidak diunggah oleh aplikasi. Jangan mengklaim website dapat dibuka offline.
+9. Gunakan screenshot aktual aplikasi jika tersedia dan sudah diverifikasi. Jangan menggunakan mockup AI sebagai bukti bahwa fitur sudah berjalan.
+10. Hindari ilustrasi tanaman besar di kanan atas dan dekorasi hero yang tidak membantu. Pertahankan Moss Theme melalui warna, ruang kosong, tipografi, dan detail kecil.
+11. Sediakan link ke Guide dan Repository.
+12. Seluruh konten Landing harus tersedia dalam EN dan ID serta mendukung Light/Dark.
+
+**Hasil yang diharapkan:** halaman depan yang ringkas, informatif, dan memiliki jalur jelas menuju Tool.
+
+**Acceptance Criteria:**
+- `/` menampilkan Landing, bukan lagi halaman Tool.
+- CTA utama mengarah ke `/app/`.
+- CTA sekunder mengarah ke `/guide/`.
+- Logo EnvMoss kembali ke Landing; tidak ada item nav `Home` atau `Landing`.
+- Konten tersedia dalam EN/ID.
+- Tema Light/Dark diterapkan.
+- Tidak ada klaim offline atau klaim privasi absolut.
+- Tidak ada ilustrasi botani besar yang mengalihkan fokus.
+
+### Milestone 11 — Guide Page
+
+**Tujuan:** Menyediakan panduan praktis yang membantu pengguna memahami dan menggunakan EnvMoss tanpa membaca source code.
+
+**Arah referensi:** gunakan struktur Guide PomeloO yang mudah dipindai, tetapi buat versi EnvMoss lebih sederhana karena jumlah fitur jauh lebih sedikit.
+
+**Pekerjaan:**
+
+1. Bangun halaman pada route `/guide/`.
+2. Gunakan navbar global dan dukungan bahasa/tema dari milestone sebelumnya.
+3. Buat navigasi bagian (table of contents) yang sederhana di sisi kiri pada layar lebar dan dapat diringkas menjadi menu pada mobile.
+4. Susun konten dalam bagian:
+   - Memulai: apa yang dibutuhkan sebelum membandingkan file.
+   - Memasukkan Base dan Target: drag-and-drop, file picker, dan textarea.
+   - Menjalankan komparasi: kapan hasil diperbarui dan arti tombol Bandingkan.
+   - Memahami hasil: Missing, Orphan, Duplicate, dan Mismatch.
+   - Menggunakan output: Markdown Checklist dan Merged `.env`.
+   - Sintaks yang didukung: aturan parsing dan contoh yang aman.
+   - Privasi: data lokal, batasan klaim, dan cara menghapus sesi.
+   - Troubleshooting: file gagal dibaca, parsing warning, clipboard tidak tersedia, dan unduhan.
+5. Gunakan contoh `.env` fiktif; jangan pernah memasukkan secret sungguhan.
+6. Tambahkan tautan yang kontekstual menuju `/app/` ketika pengguna siap mencoba fitur.
+7. Pastikan setiap section memiliki heading yang jelas dan anchor yang bisa dibagikan.
+8. Pada mobile, navigasi bagian tidak boleh mengambil terlalu banyak ruang atau menutupi konten.
+9. Seluruh isi Guide diterjemahkan ke EN/ID dan memiliki tema Light/Dark.
+
+**Hasil yang diharapkan:** pengguna dapat menemukan jawaban atas pertanyaan penggunaan umum secara mandiri.
+
+**Acceptance Criteria:**
+- `/guide/` dapat dibuka langsung dan di-refresh.
+- Semua section utama tersedia dan ditautkan melalui daftar isi.
+- Anchor menuju section bekerja tanpa tertutup navbar fixed.
+- Daftar isi responsif di mobile.
+- Semua konten tersedia dalam EN dan ID.
+- Tema Light/Dark berfungsi.
+- Contoh file sepenuhnya fiktif dan tidak berisi secret nyata.
+- CTA menuju Tool berfungsi.
+
+### Milestone 12 — Integrasi, QA, Dokumentasi, dan Rilis Web Berikutnya
+
+**Tujuan:** Memastikan perubahan multi-halaman, bilingual, dan tema tidak merusak fitur inti serta siap dipublikasikan.
+
+**Pekerjaan:**
+
+1. Jalankan regression test seluruh fungsi v1.0.0: input, parsing, empat status, Markdown Checklist, Merged `.env`, dan Hapus Semua.
+2. Uji semua rute melalui direct URL, refresh, dan navigasi antarhalaman.
+3. Uji EN/ID pada semua halaman dan seluruh state dinamis.
+4. Uji Light/Dark, preferensi tersimpan, fallback browser, dan kegagalan localStorage.
+5. Uji navbar fixed pada desktop, tablet, dan mobile; pastikan tidak menutupi konten dan keyboard focus.
+6. Uji Guide table of contents dan anchor.
+7. Uji layout dengan teks terjemahan yang lebih panjang.
+8. Uji aksesibilitas dasar: keyboard-only, focus visibility, label, nama aksesibel, kontras, dan reduced motion.
+9. Periksa Network untuk memastikan tidak ada isi `.env` yang dikirim.
+10. Pastikan hanya preferensi UI yang diizinkan yang masuk localStorage; pastikan tidak ada file content atau comparison result yang tersimpan.
+11. Periksa bahwa tidak ada CDN, external font, analytics, atau dependency baru yang tidak disetujui.
+12. Perbarui `README.md` menjadi English dan buat/selaraskan `README.id.md` berbahasa Indonesia.
+13. Pastikan README menjelaskan perbedaan Landing, Tool, dan Guide; cara menjalankan lokal; privasi; keterbatasan parser; dan lisensi.
+14. Verifikasi preview/deployment Vercel, termasuk URL halaman dan asset path.
+15. Uji seluruh route dan asset path pada deployment root Vercel serta simulasi base path subdirectory yang merepresentasikan GitHub Pages project site bila GitHub Pages tetap menjadi target.
+16. Periksa urutan HTML head: bootstrap preferensi bersifat inline dan blocking serta muncul sebelum stylesheet.
+17. Uji first paint untuk tema dan bahasa: preferensi yang tersimpan harus diterapkan sebelum tampilan terlihat; tidak boleh ada flash tema atau teks bahasa yang salah.
+18. Uji nilai localStorage yang tidak valid, localStorage yang melempar error, dan ketiadaan `matchMedia`.
+19. Uji isolasi CSS dengan membuka Landing, Tool, dan Guide satu per satu serta memeriksa tidak ada komponen yang berubah akibat stylesheet halaman lain.
+20. Catat regresi, keterbatasan, dan pengujian yang belum dapat dilakukan.
+
+**Hasil yang diharapkan:** website multi-halaman yang stabil, bilingual, memiliki Light/Dark Mode, dan mempertahankan seluruh kemampuan v1.0.0.
+
+**Acceptance Criteria:**
+- Semua acceptance criteria Milestone 7–11 terpenuhi.
+- Semua test case baseline v1.0.0 tetap lolos.
+- Tidak ada 404 pada route atau asset yang diperlukan.
+- Tidak ada console error yang berasal dari aplikasi pada alur utama.
+- Tidak ada data `.env` yang dikirim atau disimpan secara persisten.
+- README English dan Indonesian saling tertaut dan sesuai implementasi.
+- Deployment preview telah diperiksa.
+- Tidak ada path asset yang rusak saat aplikasi berada pada base path root maupun subdirectory yang diuji.
+- Tidak ada FOUC tema/bahasa yang terlihat pada first paint di pengujian.
+- CSS antarhalaman terisolasi sesuai namespacing.
+- Tidak ada release, tag, commit, atau push tanpa persetujuan pengguna.
+
+## 22. Jalur Masa Depan: EnvMoss CLI (Belum Masuk Roadmap Web Aktif)
+
+CLI adalah ide produk lanjutan yang menarik, tetapi secara sengaja ditunda agar tidak memperbesar kompleksitas web roadmap. Bagian ini adalah catatan arah eksplorasi, bukan izin untuk mulai mengimplementasikan CLI.
+
+### 22.1 Prinsip yang harus dipertahankan
+
+- CLI membaca file langsung dari filesystem lokal pengguna.
+- Tidak ada upload, telemetry, atau pengiriman isi file ke jaringan.
+- Jangan mencetak value secret secara default.
+- Jangan menimpa Target Environment secara otomatis.
+- Output merged harus dibuat sebagai file baru atau memerlukan konfirmasi eksplisit sebelum overwrite.
+- Comparison rules dan parsing behavior harus konsisten dengan web tool.
+- CLI tidak boleh menambahkan dependency atau runtime Node.js ke aplikasi web.
+
+### 22.2 Tahapan eksplorasi CLI jika disetujui nanti
+
+**CLI Discovery:** tentukan pengguna sasaran, command design, versi Node.js yang didukung, ketersediaan nama paket npm, kebutuhan distribusi `npx`, dan model file output.
+
+**CLI Core:** pastikan comparison engine dapat digunakan di Node.js tanpa ketergantungan DOM dan memiliki test yang sama dengan web engine.
+
+**CLI Interaction:** buat alur terminal yang interaktif dan ramah pengguna. Bandingkan `@clack/prompts`, Enquirer, dan Ink berdasarkan kompleksitas UX, aksesibilitas terminal, ukuran dependency, dan kebutuhan tampilan. Jangan memilih library sebelum kebutuhan UI CLI ditetapkan.
+
+**CLI Packaging:** tentukan executable `bin`, metadata package, dukungan Windows/macOS/Linux, dokumentasi, versioning, dan proses publish npm. Verifikasi dahulu nama paket tersedia dan aman digunakan.
+
+**CLI Release:** uji jalur `npx` pada lingkungan bersih, pengelolaan file, konfirmasi overwrite, error handling, dan konsistensi hasil dengan web tool.
+
+Tidak ada kode CLI, `package.json`, dependency CLI, atau publikasi npm yang boleh dibuat sampai pengguna menyetujui dimulainya jalur ini.
+
+## 23. Status Produk dan Definisi Versi
+
+- **v1.0.0:** baseline web tool yang sudah dirilis dan menjadi fondasi yang harus dipertahankan.
+- **Milestone 7–12:** rencana pengembangan website setelah v1.0.0; belum dianggap selesai atau tersedia sebelum implementasi dan verifikasi.
+- **CLI:** arah produk masa depan yang belum masuk scope aktif.
+
+Nomor versi rilis berikutnya ditentukan setelah ruang lingkup milestone diselesaikan dan diuji. Jangan mengubah versi produk hanya karena dokumen roadmap diperbarui.
+
+**Prinsip produk:** pertahankan tool inti yang dapat dipercaya, lalu perluas pengalaman di sekelilingnya secara bertahap tanpa mengorbankan privasi atau kesederhanaan.
