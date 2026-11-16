@@ -2,14 +2,23 @@
    EnvMoss — guide.css
    Stylesheet khusus Guide page (.guide-)
    Hanya dimuat oleh guide/index.html. Jangan dipakai halaman lain.
+   Semua warna memakai design token — tanpa hex hardcode (aturan M9).
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Artikel Guide
+   1. Layout artikel + daftar isi
    -------------------------------------------------------------------------- */
+
+.guide-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: start;
+}
 
 .guide-article {
   max-width: 720px;
+  min-width: 0;
 }
 
 .guide-article__header {
@@ -31,7 +40,50 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Section Guide
+   2. Daftar isi (TOC)
+   Layar lebar: sidebar sticky di kiri.
+   Layar sempit: tombol disclosure yang membuka daftar (diatur js/guide.js).
+   -------------------------------------------------------------------------- */
+
+.guide-toc {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--space-5));
+}
+
+.guide-toc__toggle {
+  display: none;
+}
+
+.guide-toc__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.guide-toc__link {
+  display: block;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-left: 2px solid var(--color-border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.guide-toc__link:hover {
+  color: var(--color-text-primary);
+  border-left-color: var(--color-primary);
+}
+
+.guide-toc__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Section Guide
    -------------------------------------------------------------------------- */
 
 .guide-section {
@@ -44,6 +96,7 @@
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: var(--space-3);
+  /* Anchor tidak tertutup navbar fixed */
   scroll-margin-top: calc(var(--nav-height) + var(--space-4));
 }
 
@@ -51,11 +104,40 @@
   font-size: var(--text-base);
   color: var(--color-text-secondary);
   line-height: 1.7;
+  margin-bottom: var(--space-3);
 }
 
-.guide-section__text code,
-.guide-article__lead code,
-.guide-steps code {
+.guide-section__text:last-child,
+.guide-list:last-child,
+.guide-status-list:last-child,
+.guide-trouble:last-child {
+  margin-bottom: 0;
+}
+
+.guide-subsection__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: var(--space-5) 0 var(--space-2);
+}
+
+/* Tautan & kode inline di dalam konten artikel */
+.guide-article p a,
+.guide-article li a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.guide-article p a:focus-visible,
+.guide-article li a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.guide-article p code,
+.guide-article li code,
+.guide-article dd code {
   font-family: var(--font-code);
   font-size: 0.9em;
   background-color: var(--color-surface);
@@ -64,13 +146,16 @@
   padding: 0 var(--space-1);
 }
 
-.guide-steps {
+/* Daftar bernomor & tak bernomor */
+.guide-steps,
+.guide-list {
   padding-left: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   color: var(--color-text-secondary);
   line-height: 1.7;
+  margin-bottom: var(--space-3);
 }
 
 .guide-steps a {
@@ -85,8 +170,192 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. Responsivitas Guide
+   4. Daftar status hasil (badge per status)
    -------------------------------------------------------------------------- */
+
+.guide-status-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.guide-status-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.guide-badge {
+  flex-shrink: 0;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+}
+
+.guide-badge--missing {
+  color: var(--status-missing-text);
+  background-color: var(--status-missing-bg);
+  border-color: var(--status-missing);
+}
+
+.guide-badge--orphan {
+  color: var(--status-orphan-text);
+  background-color: var(--status-orphan-bg);
+  border-color: var(--status-orphan);
+}
+
+.guide-badge--duplicate {
+  color: var(--status-duplicate-text);
+  background-color: var(--status-duplicate-bg);
+  border-color: var(--status-duplicate);
+}
+
+.guide-badge--mismatch {
+  color: var(--status-mismatch-text);
+  background-color: var(--status-mismatch-bg);
+  border-color: var(--status-mismatch);
+}
+
+/* --------------------------------------------------------------------------
+   5. Contoh kode & troubleshooting
+   -------------------------------------------------------------------------- */
+
+.guide-code {
+  font-family: var(--font-code);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  overflow-x: auto;
+  margin-bottom: var(--space-3);
+}
+
+.guide-trouble {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.guide-trouble__item dt {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.guide-trouble__item dd {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   6. CTA penutup
+   -------------------------------------------------------------------------- */
+
+.guide-cta {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.guide-cta__text {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   7. Responsivitas
+   -------------------------------------------------------------------------- */
+
+/* Tablet & mobile: TOC menjadi daftar collapsible di atas artikel */
+@media (max-width: 900px) {
+  .guide-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .guide-toc {
+    position: static;
+  }
+
+  .guide-toc__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .guide-toc__toggle:hover {
+    border-color: var(--color-text-secondary);
+  }
+
+  .guide-toc__toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .guide-toc__chevron {
+    flex-shrink: 0;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition-fast);
+  }
+
+  .guide-toc.is-open .guide-toc__chevron {
+    transform: rotate(180deg);
+  }
+
+  .guide-toc__list {
+    display: none;
+    margin-top: var(--space-2);
+    padding: var(--space-2);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .guide-toc.is-open .guide-toc__list {
+    display: flex;
+  }
+
+  .guide-toc__link {
+    padding: var(--space-2) var(--space-3);
+    border-left: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .guide-toc__link:hover {
+    background-color: var(--color-bg);
+    border-left-color: transparent;
+  }
+}
 
 @media (max-width: 600px) {
   .guide-article__title {
@@ -95,5 +364,9 @@
 
   .guide-article__lead {
     font-size: var(--text-base);
+  }
+
+  .guide-cta {
+    padding: var(--space-4);
   }
 }

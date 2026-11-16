@@ -238,34 +238,221 @@
 
   <!-- ==============================
        Main Content — Guide
+       TOC kiri (sticky di layar lebar, collapsible di mobile)
   ============================== -->
-  <main class="site-main guide-article">
+  <main class="site-main guide-layout">
 
-    <header class="guide-article__header">
-      <h1 class="guide-article__title" data-i18n="guide.h1">EnvMoss Guide</h1>
-      <p class="guide-article__lead" data-i18n="guide.lead">
-        How to use EnvMoss to compare two environment files locally in your browser.
-      </p>
-    </header>
+    <!-- Daftar isi section -->
+    <nav class="guide-toc" aria-label="Guide sections" data-i18n-attr="aria-label:guide.tocAria">
+      <button
+        type="button"
+        class="guide-toc__toggle"
+        id="guide-toc-toggle"
+        aria-expanded="false"
+        aria-controls="guide-toc-list"
+      >
+        <span data-i18n="guide.tocTitle">On this page</span>
+        <svg
+          class="guide-toc__chevron"
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M3 5.5L7 9.5L11 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <ul class="guide-toc__list" id="guide-toc-list">
+        <li><a class="guide-toc__link" href="#getting-started" data-i18n="guide.startTitle">Getting started</a></li>
+        <li><a class="guide-toc__link" href="#entering-files" data-i18n="guide.secEnter">Entering Base and Target</a></li>
+        <li><a class="guide-toc__link" href="#running-comparison" data-i18n="guide.secRun">Running a comparison</a></li>
+        <li><a class="guide-toc__link" href="#understanding-results" data-i18n="guide.secResults">Understanding the results</a></li>
+        <li><a class="guide-toc__link" href="#using-outputs" data-i18n="guide.secOutputs">Using the outputs</a></li>
+        <li><a class="guide-toc__link" href="#supported-syntax" data-i18n="guide.secSyntax">Supported syntax</a></li>
+        <li><a class="guide-toc__link" href="#privacy" data-i18n="guide.privacyTitle">Privacy</a></li>
+        <li><a class="guide-toc__link" href="#troubleshooting" data-i18n="guide.secTrouble">Troubleshooting</a></li>
+      </ul>
+    </nav>
 
-    <section class="guide-section" aria-labelledby="guide-start">
-      <h2 class="guide-section__title" id="guide-start" data-i18n="guide.startTitle">Getting started</h2>
-      <ol class="guide-steps">
-        <li data-i18n-html="guide.step1">Open the <a href="../app/">Comparison Tool</a>.</li>
-        <li data-i18n-html="guide.step2">Enter the <strong>Base Environment</strong> (usually <code>.env.example</code>) and the <strong>Target Environment</strong> (the file you want to inspect) via drag-and-drop, the file picker, or copy-paste into the textarea.</li>
-        <li data-i18n-html="guide.step3">Press <strong>Compare</strong> to see Missing, Orphan, Duplicate, and Mismatch.</li>
-        <li data-i18n-html="guide.step4">Use <strong>Copy Markdown Checklist</strong> or <strong>Download Merged .env</strong> to follow up on the results.</li>
-      </ol>
-    </section>
+    <article class="guide-article">
 
-    <section class="guide-section" aria-labelledby="guide-privacy">
-      <h2 class="guide-section__title" id="guide-privacy" data-i18n="guide.privacyTitle">Privacy</h2>
-      <p class="guide-section__text" data-i18n-html="guide.privacyText">
-        The contents of your <code>.env</code> files stay in your browser. EnvMoss does not
-        upload them to a server and does not store them permanently.
-      </p>
-    </section>
+      <header class="guide-article__header">
+        <h1 class="guide-article__title" data-i18n="guide.h1">EnvMoss Guide</h1>
+        <p class="guide-article__lead" data-i18n="guide.lead">
+          How to use EnvMoss to compare two environment files locally in your browser.
+        </p>
+      </header>
 
+      <!-- 1. Memulai -->
+      <section class="guide-section" aria-labelledby="getting-started">
+        <h2 class="guide-section__title" id="getting-started" data-i18n="guide.startTitle">Getting started</h2>
+        <p class="guide-section__text" data-i18n-html="guide.startP1">
+          All you need is two environment files — for example a reference file such as
+          <code>.env.example</code> and the file you want to inspect.
+        </p>
+        <p class="guide-section__text" data-i18n="guide.startP2">
+          EnvMoss runs entirely in your browser. There is nothing to install.
+        </p>
+        <p class="guide-section__text" data-i18n-html="guide.startP3">
+          New here? <a href="../app/">Open the Tool</a> and follow the steps below.
+        </p>
+        <ol class="guide-steps">
+          <li data-i18n-html="guide.step1">Open the <a href="../app/">Comparison Tool</a>.</li>
+          <li data-i18n-html="guide.step2">Enter the <strong>Base Environment</strong> and the <strong>Target Environment</strong>.</li>
+          <li data-i18n-html="guide.step3">Press <strong>Compare</strong> to see the results.</li>
+          <li data-i18n-html="guide.step4">Use the outputs to follow up on the results.</li>
+        </ol>
+      </section>
+
+      <!-- 2. Memasukkan Base dan Target -->
+      <section class="guide-section" aria-labelledby="entering-files">
+        <h2 class="guide-section__title" id="entering-files" data-i18n="guide.secEnter">Entering Base and Target</h2>
+        <p class="guide-section__text" data-i18n-html="guide.enterP1">
+          EnvMoss compares two sides: <strong>Base</strong> and <strong>Target</strong>.
+        </p>
+        <ul class="guide-list">
+          <li data-i18n-html="guide.enterDnd"><strong>Drag and drop</strong> a file onto the drop zone.</li>
+          <li data-i18n-html="guide.enterPicker"><strong>Use the file picker</strong> to select a file.</li>
+          <li data-i18n-html="guide.enterPaste"><strong>Paste the contents</strong> into the textarea.</li>
+        </ul>
+        <p class="guide-section__text" data-i18n="guide.enterNote">
+          Each side accepts one file or pasted text at a time.
+        </p>
+      </section>
+
+      <!-- 3. Menjalankan komparasi -->
+      <section class="guide-section" aria-labelledby="running-comparison">
+        <h2 class="guide-section__title" id="running-comparison" data-i18n="guide.secRun">Running a comparison</h2>
+        <p class="guide-section__text" data-i18n-html="guide.runP1">
+          The <strong>Compare</strong> button stays disabled until both sides are filled.
+        </p>
+        <p class="guide-section__text" data-i18n="guide.runP2">
+          Results appear on the board below the inputs.
+        </p>
+        <p class="guide-section__text" data-i18n="guide.runP3">
+          <strong>Clear All</strong> empties both inputs and all results.
+        </p>
+      </section>
+
+      <!-- 4. Memahami hasil -->
+      <section class="guide-section" aria-labelledby="understanding-results">
+        <h2 class="guide-section__title" id="understanding-results" data-i18n="guide.secResults">Understanding the results</h2>
+        <p class="guide-section__text" data-i18n="guide.resultsIntro">
+          Every key is grouped into one of four statuses.
+        </p>
+        <ul class="guide-status-list">
+          <li class="guide-status-item">
+            <span class="guide-badge guide-badge--missing">Missing</span>
+            <span data-i18n="landing.statusMissing">Key exists in Base but not yet in Target.</span>
+          </li>
+          <li class="guide-status-item">
+            <span class="guide-badge guide-badge--orphan">Orphan</span>
+            <span data-i18n="landing.statusOrphan">Extra key that exists only in Target.</span>
+          </li>
+          <li class="guide-status-item">
+            <span class="guide-badge guide-badge--duplicate">Duplicate</span>
+            <span data-i18n="landing.statusDuplicate">Same key declared more than once.</span>
+          </li>
+          <li class="guide-status-item">
+            <span class="guide-badge guide-badge--mismatch">Mismatch</span>
+            <span data-i18n="landing.statusMismatch">Same key, different value.</span>
+          </li>
+        </ul>
+        <p class="guide-section__text" data-i18n-html="guide.resultsNote">
+          Variable values are never displayed.
+        </p>
+      </section>
+
+      <!-- 5. Menggunakan output -->
+      <section class="guide-section" aria-labelledby="using-outputs">
+        <h2 class="guide-section__title" id="using-outputs" data-i18n="guide.secOutputs">Using the outputs</h2>
+        <h3 class="guide-subsection__title" data-i18n="guide.outputChecklistTitle">Markdown Checklist</h3>
+        <p class="guide-section__text" data-i18n="guide.outputChecklistText">
+          Copy a ready-to-paste task list of every Missing key.
+        </p>
+        <h3 class="guide-subsection__title" data-i18n="guide.outputMergedTitle">Merged .env</h3>
+        <p class="guide-section__text" data-i18n="guide.outputMergedText">
+          Download a copy of your Target completed with Missing keys.
+        </p>
+        <p class="guide-section__text" data-i18n-html="guide.outputsNote">
+          If the browser blocks clipboard access, the text stays selected.
+        </p>
+      </section>
+
+      <!-- 6. Sintaks yang didukung -->
+      <section class="guide-section" aria-labelledby="supported-syntax">
+        <h2 class="guide-section__title" id="supported-syntax" data-i18n="guide.secSyntax">Supported syntax</h2>
+        <p class="guide-section__text" data-i18n-html="guide.syntaxP1">
+          EnvMoss understands the common dotenv format.
+        </p>
+        <ul class="guide-list">
+          <li data-i18n-html="guide.syntaxKeys">Key names must start with a letter or underscore.</li>
+          <li data-i18n-html="guide.syntaxComments">Lines starting with <code>#</code> are comments.</li>
+          <li data-i18n-html="guide.syntaxExport">An optional <code>export</code> prefix is accepted.</li>
+          <li data-i18n-html="guide.syntaxQuotes">Values may be wrapped in single or double quotes.</li>
+          <li data-i18n-html="guide.syntaxBlank">Empty lines are ignored; unparsable lines become warnings.</li>
+        </ul>
+        <h3 class="guide-subsection__title" data-i18n="guide.syntaxExampleTitle">Fictional example</h3>
+        <pre class="guide-code"><code># Fictional example — not a real secret
+APP_NAME=demo-app
+API_KEY=change-me-in-production
+DATABASE_URL=postgres://localhost:5432/demo
+export FEATURE_FLAG=true
+QUOTED_VALUE="hello world"
+EMPTY_VALUE=
+</code></pre>
+        <p class="guide-section__text" data-i18n-html="guide.syntaxWarn">
+          Unparsable lines are reported as parsing warnings.
+        </p>
+      </section>
+
+      <!-- 7. Privasi -->
+      <section class="guide-section" aria-labelledby="privacy">
+        <h2 class="guide-section__title" id="privacy" data-i18n="guide.privacyTitle">Privacy</h2>
+        <p class="guide-section__text" data-i18n-html="guide.privacyText">
+          The contents of your <code>.env</code> files stay in your browser.
+        </p>
+        <p class="guide-section__text" data-i18n-html="guide.privacyP2">
+          To end a session, press <strong>Clear All</strong> and close the tab.
+        </p>
+        <p class="guide-section__text" data-i18n="guide.privacyLimit">
+          This guarantee covers EnvMoss itself.
+        </p>
+      </section>
+
+      <!-- 8. Troubleshooting -->
+      <section class="guide-section" aria-labelledby="troubleshooting">
+        <h2 class="guide-section__title" id="troubleshooting" data-i18n="guide.secTrouble">Troubleshooting</h2>
+        <dl class="guide-trouble">
+          <div class="guide-trouble__item">
+            <dt data-i18n="guide.troubleReadT">The file could not be read</dt>
+            <dd data-i18n-html="guide.troubleReadD">The file may be locked or corrupted.</dd>
+          </div>
+          <div class="guide-trouble__item">
+            <dt data-i18n="guide.troubleWarnT">Parsing warnings appear</dt>
+            <dd data-i18n-html="guide.troubleWarnD">Some lines were skipped.</dd>
+          </div>
+          <div class="guide-trouble__item">
+            <dt data-i18n="guide.troubleClipboardT">Copy to clipboard fails</dt>
+            <dd data-i18n="guide.troubleClipboardD">Clipboard permission may be denied.</dd>
+          </div>
+          <div class="guide-trouble__item">
+            <dt data-i18n="guide.troubleDownloadT">The download does not start</dt>
+            <dd data-i18n="guide.troubleDownloadD">Check your browser's download settings.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- CTA penutup -->
+      <div class="guide-cta">
+        <p class="guide-cta__text" data-i18n="guide.ctaText">Everything happens locally.</p>
+        <a class="site-btn site-btn--primary" href="../app/" data-i18n="guide.ctaBtn">Open the Tool</a>
+      </div>
+
+    </article>
   </main>
 
   <!-- ==============================
@@ -279,6 +466,9 @@
 
   <!-- JS modul perilaku global: navbar aktif, bahasa, tema -->
   <script type="module" src="../js/site.js"></script>
+
+  <!-- JS modul perilaku Guide: toggle daftar isi mobile -->
+  <script type="module" src="../js/guide.js"></script>
 
   <!-- Failsafe i18n: jika modul kamus gagal dimuat, lepaskan penanda pending
        agar konten fallback English tetap terlihat dan tidak tersembunyi. -->
