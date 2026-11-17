@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/envmoss_logo.png" width="300">
+  <img src="assets/icons/envmoss_logo.svg" width="450">
 </p>
 
 > **Compare. Validate. Keep Your Secrets Local.**
