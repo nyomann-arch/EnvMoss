@@ -1,4 +1,6 @@
-# EnvMoss
+<p align="center">
+  <img src="assets/images/envmoss_logo.png" width="300">
+</p>
 
 > **Compare. Validate. Keep Your Secrets Local.**
 
